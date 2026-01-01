@@ -18,15 +18,17 @@ namespace auth_service.authservice.application.handler
             _iUserRepo = repositories;
         }
 
-        public async Task<bool> LoginHandler(RequestAccount request)
+        public async Task<LoginResponse> LoginHandler(RequestAccount request)
         {
-           var userEmail = new EmailObject(request.Email);
+            var userEmail = new EmailObject(request.Email);
 
             var userRequest = new UserEntity(userEmail, request.Password);
 
-            if (await _iUserRepo.GetUserByEmail(userRequest.Email.EmailAdress) == null)   // kiểm tra email có tồn tại trong db ko 
+            var user = await _iUserRepo.GetUserByEmail(userRequest.Email.EmailAdress);
+
+            if (user == null)   // kiểm tra email có tồn tại trong db ko 
             {
-                return false;
+                return new LoginResponse() { IsSuccess = false, Message = "Invalid email or password." };
             }
 
 
@@ -38,11 +40,11 @@ namespace auth_service.authservice.application.handler
 
             if (hashpass == passwordHashFromDb)
             {
-                return true;
+                return new LoginResponse() { IsSuccess = true, UserId = user.Id };
             }
             else
             {
-                return false;
+                return new LoginResponse() { IsSuccess = false, Message = "Invalid email or password." };
             }
         }
 

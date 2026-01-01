@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace food_service.Controllers
@@ -29,5 +30,14 @@ namespace food_service.Controllers
             })
             .ToArray();
         }
+
+
+        [Authorize]
+        public IActionResult GetWeather()
+        {
+            var s = " test ";
+            return Ok(s);
+        }
+
     }
 }

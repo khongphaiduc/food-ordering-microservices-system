@@ -13,12 +13,14 @@ namespace auth_service.authservice.api.authControlller
         private readonly ICreateUserHandler _createUerHandler;
         private readonly IUserLogin _iUserLogin;
         private readonly IAuthenticationToken _iAuthen;
+        private readonly IRefreshTokensRepositories _iRefreshToken;
 
-        public UserAuthenticationController(ICreateUserHandler createUserHandler, IUserLogin userLogin, IAuthenticationToken authenticationToken)
+        public UserAuthenticationController(ICreateUserHandler createUserHandler, IUserLogin userLogin, IAuthenticationToken authenticationToken, IRefreshTokensRepositories refreshTokensRepositories)
         {
             _createUerHandler = createUserHandler;
             _iUserLogin = userLogin;
             _iAuthen = authenticationToken;
+            _iRefreshToken = refreshTokensRepositories;
         }
 
         [HttpPost("signup")]
@@ -38,14 +40,17 @@ namespace auth_service.authservice.api.authControlller
         {
             var result = await _iUserLogin.LoginHandler(loginAccount);
 
-            if (result)
+            if (result.IsSuccess)
             {
-                var infoToken = _iAuthen.GenerateToken(loginAccount.Email, "Customer");
-                return Ok(new { account = loginAccount.Email, tokenInfor = infoToken });
+                var infoToken = _iAuthen.GenerateToken(loginAccount.Email, "Customer", "AccessToken"); // access token
+
+                var refreshTokenInfor = await _iRefreshToken.AddRefreshToken(result.UserId.Value); // refresh token
+
+                return Ok(new { account = loginAccount.Email, accessToken = infoToken , refreshToken = refreshTokenInfor });
             }
             else
             {
-                return Unauthorized(new { status = result, email = loginAccount.Email });
+                return Unauthorized(new { status = result.IsSuccess, email = loginAccount.Email , message = result.Message });
             }
 
         }

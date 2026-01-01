@@ -1,4 +1,5 @@
-﻿using auth_service.authservice.application.dtos;
+﻿using auth_service.authservice.api.CustomExceptionSerives;
+using auth_service.authservice.application.dtos;
 using auth_service.authservice.application.InterfaceApplication;
 using auth_service.authservice.domain.entities;
 using auth_service.authservice.domain.Interfaces;
@@ -9,11 +10,13 @@ namespace auth_service.authservice.application.handler
     {
         private readonly IUserRepositories _iuserRepo;
         private readonly IHashPassword _iHashPass;
+        private readonly IRoleUser _iRoleUser;
 
-        public CreateUserHandler(IUserRepositories userRepositories, IHashPassword hashPassword)
+        public CreateUserHandler(IUserRepositories userRepositories, IHashPassword hashPassword, IRoleUser roleUser)
         {
             _iuserRepo = userRepositories;
             _iHashPass = hashPassword;
+            _iRoleUser = roleUser;
 
         }
 
@@ -22,7 +25,7 @@ namespace auth_service.authservice.application.handler
         {
 
             // check email exists
-            if (await _iuserRepo.GetUserByEmail(register.Email)!= null)
+            if (await _iuserRepo.GetUserByEmail(register.Email) != null)
             {
                 register.IsSuccessful = false;
                 register.Message = "Email already exists";
@@ -49,6 +52,14 @@ namespace auth_service.authservice.application.handler
 
             // domain 
             var result = await _iuserRepo.CreateAccount(guesuser);
+
+            // gán role 
+            var resultAsignRole = await _iRoleUser.AddMappingRoleToUser(register.Email);
+
+            if (!resultAsignRole)
+            {
+                throw new WriteDbException("Gán Role Thất Bại");
+            }
 
             if (result)
             {

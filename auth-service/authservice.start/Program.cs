@@ -28,6 +28,8 @@ namespace auth_service.authservice.start
             builder.Services.AddTransient<IUserRepositories, UserRepositories>();
             builder.Services.AddTransient<IUserLogin, UserSignInHandler>();
             builder.Services.AddTransient<IAuthenticationToken, AuthenticationJWT>();
+            builder.Services.AddTransient<IRefreshTokensRepositories, RefreshTokensRepositories>();
+            builder.Services.AddTransient<IRoleUser, RoleUser>();
 
             var app = builder.Build();
 

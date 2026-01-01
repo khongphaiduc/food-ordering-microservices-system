@@ -1,4 +1,5 @@
-﻿using auth_service.authservice.application.InterfaceApplication;
+﻿using auth_service.authservice.application.dtos;
+using auth_service.authservice.application.InterfaceApplication;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,10 +16,18 @@ namespace auth_service.authservice.infastructure.Securities
             _iconfig = configuration;
         }
 
-        public object GenerateToken(string email, string role)
+        public TokenResult GenerateToken(string email, string role, string type)
         {
+            int time;
+            if (type == "AccessToken")
+            {
+                time = int.Parse(_iconfig["Jwt:Time:AccessToken"]!);
+            }
+            else
+            {
+                time = int.Parse(_iconfig["Jwt:Time:RefreshToken"]!);
+            }   
 
-            var time = int.Parse(_iconfig["Jwt:Time"]!);
             var listClaim = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, email),
@@ -32,9 +41,9 @@ namespace auth_service.authservice.infastructure.Securities
                     issuer: _iconfig["JWT:Issuer"],
                     audience: _iconfig["JWT:Audience"],
                     claims: listClaim,
-                    expires: DateTime.UtcNow.AddHours(time),
+                    expires: type == "AccessToken" ? DateTime.UtcNow.AddMinutes(time) : DateTime.UtcNow.AddHours(time),
                     signingCredentials: creds);
-            return new { token = new JwtSecurityTokenHandler().WriteToken(token), timeExpire = time, timeCreate = DateTime.Now };
+            return new TokenResult  { TypeToken = type, Token = new JwtSecurityTokenHandler().WriteToken(token), TimeExpire = time, TimeCreate = DateTime.Now };
         }
 
     }

@@ -4,6 +4,6 @@ namespace auth_service.authservice.application.InterfaceApplication
 {
     public interface IUserLogin
     {
-        public Task<bool> LoginHandler(RequestAccount request);
+        public Task<LoginResponse> LoginHandler(RequestAccount request);
     }
 }

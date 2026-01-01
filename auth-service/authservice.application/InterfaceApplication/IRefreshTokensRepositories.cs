@@ -2,9 +2,9 @@
 
 namespace auth_service.authservice.application.InterfaceApplication
 {
-    public interface IAuthenticationToken
+    public interface IRefreshTokensRepositories
     {
-        public TokenResult GenerateToken(string email, string  role, string type);
+        Task<TokenResult> AddRefreshToken(Guid idUser);
 
     }
 }
