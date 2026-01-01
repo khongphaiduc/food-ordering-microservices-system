@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using auth_service.authservice.infastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace auth_service.Models;
+namespace auth_service.authservice.infastructure.dbcontexts;
 
 public partial class FoodAuthContext : DbContext
 {

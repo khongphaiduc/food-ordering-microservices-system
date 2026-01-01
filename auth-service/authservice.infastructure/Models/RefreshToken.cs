@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace auth_service.Models;
+namespace auth_service.authservice.infastructure.Models;
 
 public partial class RefreshToken
 {
