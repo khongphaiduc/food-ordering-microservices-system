@@ -11,12 +11,10 @@ namespace auth_service.authservice.api.authControlller
     [ApiController]
     public class RefreshAccessTokenController : ControllerBase
     {
-        private readonly IAuthenticationToken _iauthenicatioin;
         private readonly IProvideoAccessToken _iprovideAccessToken;
 
-        public RefreshAccessTokenController(IAuthenticationToken authenticationToken, IProvideoAccessToken provideoAccessToken)
+        public RefreshAccessTokenController(IProvideoAccessToken provideoAccessToken)
         {
-            _iauthenicatioin = authenticationToken;
             _iprovideAccessToken = provideoAccessToken;
         }
 
