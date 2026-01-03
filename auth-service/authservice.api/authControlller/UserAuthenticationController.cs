@@ -1,10 +1,8 @@
-﻿using auth_service.authservice.api.CustomExceptionSerives;
+﻿
 using auth_service.authservice.application.dtos;
 using auth_service.authservice.application.InterfaceApplication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.WebSockets;
-
 
 namespace auth_service.authservice.api.authControlller
 {
@@ -73,7 +71,7 @@ namespace auth_service.authservice.api.authControlller
 
             await _iRefreshToken.RevokeOldToken(request.UserId);
 
-            return Ok(new { message = "Logout successfully" });
+            return Ok(new { message = "Logout successfully"});
         }
 
     }
