@@ -1,6 +1,7 @@
 ﻿using auth_service.authservice.api.CustomExceptionSerives;
 using auth_service.authservice.application.dtos;
 using auth_service.authservice.application.InterfaceApplication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 
@@ -45,17 +46,11 @@ namespace auth_service.authservice.api.authControlller
             {
                 var infoToken = _iAuthen.GenerateToken(loginAccount.Email, "Customer", "AccessToken"); // access token
 
-                var resultRevokeToken = await _iRefreshToken.RevokeOldToken(result.UserId.Value); // thu hoi token cu
+                await _iRefreshToken.RevokeOldToken(result.UserId.Value); // thu hoi token cu
 
-                if (resultRevokeToken)
-                {
-                    var refreshTokenInfor = await _iRefreshToken.AddRefreshToken(result.UserId.Value); // refresh token
-                    return Ok(new { Id = result.UserId, account = loginAccount.Email, accessToken = infoToken, refreshToken = refreshTokenInfor });
-                }
-                else
-                {
-                    throw new RevokeTokenFailException("Revoke old token failed");
-                }
+                var refreshTokenInfor = await _iRefreshToken.AddRefreshToken(result.UserId.Value); // refresh token
+
+                return Ok(new { Id = result.UserId, account = loginAccount.Email, accessToken = infoToken, refreshToken = refreshTokenInfor });
 
             }
             else
@@ -63,6 +58,22 @@ namespace auth_service.authservice.api.authControlller
                 return Unauthorized(new { status = result.IsSuccess, email = loginAccount.Email, message = result.Message });
             }
 
+        }
+
+        [Authorize]
+        [HttpPut("logout")]
+        public async Task<IActionResult> UserLogOut([FromBody] LogOutRequest request)
+        {
+
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            var resultCheckToken = await _iRefreshToken.IsInvokedToken(token);
+
+            if (resultCheckToken) return Unauthorized(new { message = "Token has been revoked" });
+
+            await _iRefreshToken.RevokeOldToken(request.UserId);
+
+            return Ok(new { message = "Logout successfully" });
         }
 
     }

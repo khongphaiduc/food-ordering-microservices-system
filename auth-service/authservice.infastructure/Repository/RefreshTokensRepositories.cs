@@ -57,27 +57,24 @@ namespace auth_service.authservice.infastructure.Repository
 
         }
 
-        // thu hoi token cu
-        public async Task<bool> RevokeOldToken(Guid idUser)
+        // check xem token đã bị thu hồi hay chưa
+        public async Task<bool> IsInvokedToken(string token)
         {
+            return await _db.RefreshTokens.AnyAsync(s => s.Token == token && s.RevokedAt != null);
+        }
 
+        // thu hoi token cu
+        public async Task RevokeOldToken(Guid idUser)
+        {
             var userRrefreshToken = await _db.RefreshTokens.FirstOrDefaultAsync(s => s.UserId == idUser && s.RevokedAt == null);
 
             if (userRrefreshToken != null)
             {
-
-
                 userRrefreshToken.RevokedAt = DateTime.Now;
-
-            }
-            else
-            {
-                return true;
+                await _db.SaveChangesAsync();
             }
 
-            int row = await _db.SaveChangesAsync();
-
-            return row > 0 ? true : false;
         }
+
     }
 }
