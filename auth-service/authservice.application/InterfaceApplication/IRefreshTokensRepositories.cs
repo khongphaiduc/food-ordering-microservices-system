@@ -4,10 +4,11 @@ namespace auth_service.authservice.application.InterfaceApplication
 {
     public interface IRefreshTokensRepositories
     {
-        Task<TokenResult> AddRefreshToken(Guid idUser);
+        Task<TokenResult> AddRefreshToken(Guid idUser);  //tạo mới
 
-        Task RevokeOldToken(Guid idUser);
-        Task<bool> IsInvokedToken (string token);
+        Task RevokeOldToken(Guid idUser); // thu hồi 
+
+        Task<bool> IsInvokedToken (string token);  // check token có bị thu hồi hay không
 
     }
 }

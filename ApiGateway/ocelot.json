@@ -10,7 +10,11 @@
         }
       ],
       "UpstreamPathTemplate": "/users/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamHeaderTransform": {
+        "X-Forwarded-Host": "localhost:7150",
+        "X-Forwarded-Proto": "https"
+      }
     },
 
     {
