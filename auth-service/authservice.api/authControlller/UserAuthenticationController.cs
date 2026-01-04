@@ -55,13 +55,15 @@ namespace auth_service.authservice.api.authControlller
             {
                 return Unauthorized(new { status = result.IsSuccess, email = loginAccount.Email, message = result.Message });
             }
-
         }
 
         [Authorize]
         [HttpPut("logout")]
         public async Task<IActionResult> UserLogOut([FromBody] LogOutRequest request)
         {
+            var TypeToken = _iAuthen.GetTypeTokenJWT(this.HttpContext);
+
+            if (TypeToken != "AccessToken") return Unauthorized("Token not valid");
 
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
@@ -71,7 +73,7 @@ namespace auth_service.authservice.api.authControlller
 
             await _iRefreshToken.RevokeOldToken(request.UserId);
 
-            return Ok(new { message = "Logout successfully"});
+            return Ok(new { message = "Logout successfully" });
         }
 
     }
