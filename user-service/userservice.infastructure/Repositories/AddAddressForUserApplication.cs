@@ -23,9 +23,11 @@ namespace user_service.userservice.infastructure.Repositories
                 AddressLine1 = new StreetAddress(addressUser.AddressLine1),
                 AddressLine2 = addressUser.AddressLine2,
                 City = new CityName(addressUser.City),
+                District = addressUser.District,
                 PostalCode = new PostalCode(addressUser.PostalCode),
                 IsDefault = false,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
             return await _IAddressUser.AddAdressForUser(AddressEntity);

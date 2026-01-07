@@ -57,6 +57,7 @@ namespace auth_service.authservice.api.authControlller
             }
         }
 
+
         [Authorize]
         [HttpPut("logout")]
         public async Task<IActionResult> UserLogOut([FromBody] LogOutRequest request)

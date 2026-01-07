@@ -66,7 +66,7 @@ namespace auth_service.authservice.infastructure.Securities
             var jwtToken = handler.ReadJwtToken(token);
 
             // Lấy claim TypeToken
-            var typeTokenClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "TypeToken")?.Value;
+            var typeTokenClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "TokenType")?.Value;
 
             if (typeTokenClaim == null)
                 throw new Exception("TypeToken claim not found");

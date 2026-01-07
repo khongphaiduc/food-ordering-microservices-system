@@ -17,9 +17,7 @@ namespace auth_service.authservice.application.handler
             _iuserRepo = userRepositories;
             _iHashPass = hashPassword;
             _iRoleUser = roleUser;
-
         }
-
 
         public async Task<RequestAccount> HandleCreateUser(RequestAccount register)
         {

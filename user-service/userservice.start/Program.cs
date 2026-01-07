@@ -53,7 +53,7 @@ namespace user_service.userservice.start
             builder.Services.AddControllers();
 
             var app = builder.Build();
-
+            app.UseRouting();
             app.UseMiddleware<GlobalExceptions>();  // đăng ký vào middleware
 
 
@@ -61,8 +61,7 @@ namespace user_service.userservice.start
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseRouting();
-
+          
             app.MapControllers();
 
             app.Run();

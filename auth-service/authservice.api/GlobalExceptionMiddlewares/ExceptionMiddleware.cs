@@ -17,7 +17,7 @@ namespace auth_service.authservice.api.Middlewares
         {
             try
             {
-                await _next(context);
+                await _next(context); // chuyển qua middleware tiếp theo
             }
             catch (Exception ex)
             {
@@ -34,7 +34,7 @@ namespace auth_service.authservice.api.Middlewares
             {
                 NotFoundException => StatusCodes.Status404NotFound,
                 RevokeTokenFailException => StatusCodes.Status508LoopDetected,
-
+                WriteDbException => StatusCodes.Status404NotFound,
                 _ => StatusCodes.Status500InternalServerError
             };
 
@@ -46,6 +46,8 @@ namespace auth_service.authservice.api.Middlewares
 
             return context.Response.WriteAsJsonAsync(response);
         }
+
+
 
     }
 }

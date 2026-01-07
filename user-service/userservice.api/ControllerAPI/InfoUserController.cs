@@ -22,8 +22,9 @@ namespace user_service.userservice.api.ControllerAPI
             _iValidationJWT = validationJWT;
         }
 
-        [Authorize]
+
         [HttpPost("person")]
+        [Authorize]
         public async Task<IActionResult> AddUser([FromBody] RequestPersonalInforUsers requestUser)
         {
             var TypeToken = _iValidationJWT.GetTypeToken(this.HttpContext);
@@ -34,14 +35,14 @@ namespace user_service.userservice.api.ControllerAPI
             return Created("", new { status = "Add User successfuly" });
         }
 
-        [Authorize]
+
         [HttpPost("info")]
         public async Task<IActionResult> AddAdressUser([FromBody] RequestInfoAddressUser requestInfo)
         {
 
-            var TypeToken = _iValidationJWT.GetTypeToken(this.HttpContext);
+            //var TypeToken = _iValidationJWT.GetTypeToken(this.HttpContext);
 
-            if (TypeToken != "AccessToken") return Unauthorized(new { status = "Token is not valid" });
+            //if (TypeToken != "AccessToken") return Unauthorized(new { status = "Token is not valid" });
 
             var resutl = await _IaddAddressUserApplication.Handle(requestInfo);
 

@@ -13,5 +13,7 @@ namespace user_service.userservice.domain.interfaces
 
         Task<bool> UpdateAdressForUser(AddressUserEntity addressUser);
 
+        Task<bool> IsEmailExsit(string email);
+
     }
 }

@@ -21,8 +21,9 @@ namespace auth_service.authservice.api.authControlller
         }
 
         // cấp lại access token
-        [HttpPost("accesstoken")]
         [Authorize]
+        [HttpPost("accesstoken")]
+     
         public async Task<IActionResult> RequestProvideAccessToken([FromBody] RequetsProvideAccessToken request)
         {
 
@@ -33,5 +34,10 @@ namespace auth_service.authservice.api.authControlller
             return Created("", new TokenResult() { TypeToken = tokenResult.TypeToken, Token = tokenResult.Token, TimeCreate = tokenResult.TimeCreate, TimeExpire = tokenResult.TimeExpire });
         }
 
+        [HttpGet("test")]
+        public IActionResult actionResult()
+        {
+            return Ok("Xin chài ");
+        }
     }
 }

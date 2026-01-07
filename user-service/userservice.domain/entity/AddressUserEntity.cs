@@ -12,8 +12,8 @@ namespace user_service.userservice.domain.entity
         public string? District { get; set; }
         public PostalCode? PostalCode { get; set; }
         public bool IsDefault { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set;}  = DateTime.Now;
+        public DateTime UpdatedAt { get; set; }  = DateTime.Now;
 
     }
 }

@@ -29,7 +29,8 @@ namespace user_service.userservice.infastructure.Repositories
                 City = addressUser.City.Value,
                 District = addressUser.District,
                 PostalCode = addressUser.PostalCode.Value,
-                CreatedAt = DateTime.Now
+                CreatedAt = addressUser.CreatedAt,
+                UpdatedAt = addressUser.UpdatedAt,
             });
             return await _db.SaveChangesAsync() > 0;
         }
@@ -44,11 +45,19 @@ namespace user_service.userservice.infastructure.Repositories
                 Email = user.EmailAddress?.Value,
                 PhoneNumber = user.PhoneNumbers.Number,
                 IsActive = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             });
 
-
             return await _db.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> IsEmailExsit(string email)
+        {
+
+            var user = await _db.Users.FirstOrDefaultAsync(s => s.Email == email);
+
+            return user != null;
         }
 
         public Task<bool> UpdateAdressForUser(AddressUserEntity addressUser)

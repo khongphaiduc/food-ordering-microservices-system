@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using user_service.userservice.api.CustomExceptionService;
 using user_service.userservice.application.dtos;
 using user_service.userservice.application.interfaceApplications;
 using user_service.userservice.domain.entity;
@@ -20,6 +21,13 @@ namespace user_service.userservice.infastructure.Repositories
         {
 
             var userEntity = new UsersEntity(users.IdUser, users.Name, new Email(users.Email), new PhoneNumber(users.PhoneNumber));
+
+            var isEmailExsit = await _iUserRepo.IsEmailExsit(users.Email ?? "");
+
+            if (isEmailExsit)
+            {
+                throw new ExitEmail("Email already exists");
+            }
 
             return await _iUserRepo.AddUser(userEntity);
 

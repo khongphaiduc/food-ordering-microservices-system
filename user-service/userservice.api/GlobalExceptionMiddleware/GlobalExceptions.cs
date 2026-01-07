@@ -35,6 +35,7 @@ namespace user_service.userservice.api.GlobalExceptionMiddleware
             {
                 ValidationNotAccept => StatusCodes.Status400BadRequest,
                 NotFoundException => StatusCodes.Status404NotFound,
+                ExitEmail => StatusCodes.Status409Conflict,
                 _ => StatusCodes.Status500InternalServerError
             };
 

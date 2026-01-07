@@ -27,11 +27,11 @@ namespace auth_service.authservice.start
                 option.UseSqlServer(builder.Configuration["URLSQL"]));
 
             
-            builder.Services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => false;
-                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-            });
+            //builder.Services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    options.CheckConsentNeeded = context => false;
+            //    options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+            //});
 
             builder.Services.AddAuthentication(option =>
             {
@@ -51,56 +51,56 @@ namespace auth_service.authservice.start
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!))
                 };
-            })
+            });
       
-            .AddCookie("ExternalCookie", options =>
-            {
-                options.Cookie.Name = "FoodAuth.External";
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.Path = "/";
-            })
-            .AddGoogle("Google", options =>
-            {
-                options.ClientId = builder.Configuration["ClientID"]!;
-                options.ClientSecret = builder.Configuration["Clientsecret"]!;
-                options.SignInScheme = "ExternalCookie";
+            //.AddCookie("ExternalCookie", options =>
+            //{
+            //    options.Cookie.Name = "FoodAuth.External";
+            //    options.Cookie.SameSite = SameSiteMode.Lax;
+            //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            //    options.Cookie.Path = "/";
+            //})
+            //.AddGoogle("Google", options =>
+            //{
+            //    options.ClientId = builder.Configuration["ClientID"]!;
+            //    options.ClientSecret = builder.Configuration["Clientsecret"]!;
+            //    options.SignInScheme = "ExternalCookie";
 
-                // Khớp với DownstreamPath trong ocelot.json
-                options.CallbackPath = "/api/users/signin-google";
+            //    // Khớp với DownstreamPath trong ocelot.json
+            //    options.CallbackPath = "/api/users/signin-google";
 
-                options.ClaimActions.MapJsonKey("avatar", "picture", "url");
+            //    options.ClaimActions.MapJsonKey("avatar", "picture", "url");
 
-                options.Events = new OAuthEvents
-                {
-                    OnRedirectToAuthorizationEndpoint = context =>
-                    {
-                        // Đánh tráo Port nội bộ (7191) bằng Port Gateway (7150) gửi cho Google
-                        string decodedUrl = WebUtility.UrlDecode(context.RedirectUri);
-                        string interceptedUrl = decodedUrl
-                            .Replace("localhost:7191/api/users", "localhost:7150/users")
-                            .Replace("127.0.0.1:7191/api/users", "localhost:7150/users");
+            //    options.Events = new OAuthEvents
+            //    {
+            //        OnRedirectToAuthorizationEndpoint = context =>
+            //        {
+            //            // Đánh tráo Port nội bộ (7191) bằng Port Gateway (7150) gửi cho Google
+            //            string decodedUrl = WebUtility.UrlDecode(context.RedirectUri);
+            //            string interceptedUrl = decodedUrl
+            //                .Replace("localhost:7191/api/users", "localhost:7150/users")
+            //                .Replace("127.0.0.1:7191/api/users", "localhost:7150/users");
 
-                        context.Response.Redirect(interceptedUrl);
-                        return Task.CompletedTask;
-                    },
-                    OnRemoteFailure = context =>
-                    {
-                        // Khi lỗi (ví dụ Correlation failed), nhảy về Gateway để xử lý
-                        context.Response.Redirect("https://localhost:7150/users/google-error?message=" +
-                                                   WebUtility.UrlEncode(context.Failure?.Message));
-                        context.HandleResponse();
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+            //            context.Response.Redirect(interceptedUrl);
+            //            return Task.CompletedTask;
+            //        },
+            //        OnRemoteFailure = context =>
+            //        {
+            //            // Khi lỗi (ví dụ Correlation failed), nhảy về Gateway để xử lý
+            //            context.Response.Redirect("https://localhost:7150/users/google-error?message=" +
+            //                                       WebUtility.UrlEncode(context.Failure?.Message));
+            //            context.HandleResponse();
+            //            return Task.CompletedTask;
+            //        }
+            //    };
+            //});
 
-            builder.Services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                options.KnownNetworks.Clear();
-                options.KnownProxies.Clear();
-            });
+            //builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            //{
+            //    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            //    options.KnownNetworks.Clear();
+            //    options.KnownProxies.Clear();
+            //});
 
     
             builder.Services.AddTransient<ICreateUserHandler, CreateUserHandler>();
@@ -113,13 +113,18 @@ namespace auth_service.authservice.start
             builder.Services.AddTransient<IProvideoAccessToken, ProvideoAccessToken>();
             builder.Services.AddTransient<IAuthenticationByGoogle, AuthenticationByGoogle>();
 
-            var app = builder.Build();
 
+            var app = builder.Build();
+            
            
             app.UseForwardedHeaders();
+
             app.UseCookiePolicy(); 
 
-            app.UseMiddleware<ExceptionMiddleware>();
+
+
+            app.UseMiddleware<ExceptionMiddleware>(); // 
+
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
