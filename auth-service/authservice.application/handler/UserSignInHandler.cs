@@ -20,7 +20,7 @@ namespace auth_service.authservice.application.handler
 
         public async Task<LoginResponse> LoginHandler(RequestAccount request)
         {
-            var userEmail = new EmailObject(request.Email);
+            var userEmail = new Email(request.Email);
 
             var userRequest = new UserEntity(userEmail, request.Password);
 

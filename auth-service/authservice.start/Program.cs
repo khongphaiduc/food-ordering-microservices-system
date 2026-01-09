@@ -36,8 +36,8 @@ namespace auth_service.authservice.start
             builder.Services.AddAuthentication(option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = "Google";
-                option.DefaultSignInScheme = "ExternalCookie";
+                //option.DefaultChallengeScheme = "Google";
+                //option.DefaultSignInScheme = "ExternalCookie";
             })
             .AddJwtBearer(option =>
             {
@@ -55,7 +55,7 @@ namespace auth_service.authservice.start
       
             //.AddCookie("ExternalCookie", options =>
             //{
-            //    options.Cookie.Name = "FoodAuth.External";
+            //    options.Cookie.FullNameOfUser = "FoodAuth.External";
             //    options.Cookie.SameSite = SameSiteMode.Lax;
             //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             //    options.Cookie.Path = "/";
@@ -95,12 +95,8 @@ namespace auth_service.authservice.start
             //    };
             //});
 
-            //builder.Services.Configure<ForwardedHeadersOptions>(options =>
-            //{
-            //    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            //    options.KnownNetworks.Clear();
-            //    options.KnownProxies.Clear();
-            //});
+           
+
 
     
             builder.Services.AddTransient<ICreateUserHandler, CreateUserHandler>();

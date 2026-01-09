@@ -1,5 +1,7 @@
+using food_service.productservice.infastructure.ProductDbContexts;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 
 namespace food_service
 {
@@ -7,9 +9,18 @@ namespace food_service
     {
         public static void Main(string[] args)
         {
+
+            DotNetEnv.Env.Load();
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            builder.Services.AddDbContext<FoodProductsDbContext>(options =>
+            {
+                options.UseNpgsql(builder.Configuration["SQLFOOD_PRODUCTS"]!);
+            });
+
 
             builder.Services.AddControllers();
 

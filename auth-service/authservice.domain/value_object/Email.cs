@@ -1,10 +1,10 @@
 ﻿namespace auth_service.authservice.domain.value_object
 {
-    public class EmailObject
+    public class Email
     {
         public string EmailAdress { get; } = null!;
 
-        public EmailObject(string emailAdress)
+        public Email(string emailAdress)
         {
             if (string.IsNullOrWhiteSpace(emailAdress) || !emailAdress.Contains(".com"))
             {

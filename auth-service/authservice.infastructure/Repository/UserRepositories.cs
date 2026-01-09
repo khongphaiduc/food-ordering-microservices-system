@@ -72,7 +72,7 @@ namespace auth_service.authservice.infastructure.Repository
             {
                 Id = existEmail.Id,
                 Username = existEmail.Username,
-                Email = new EmailObject(existEmail.Email),
+                Email = new Email(existEmail.Email),
                 PasswordHash = existEmail.PasswordHash,
                 PasswordSalt = existEmail.PasswordSalt,
                 IsActive = existEmail.IsActive,

@@ -8,7 +8,7 @@ namespace auth_service.authservice.domain.entities
 
         public string Username { get; set; } = null!;
 
-        public EmailObject Email { get; set; } = null!;
+        public Email Email { get; set; } = null!;
 
         public string Password { get; set; } = null!; // pass gốc của user gửi lên 
 
@@ -23,7 +23,7 @@ namespace auth_service.authservice.domain.entities
         public DateTime? UpdatedAt { get; set; }
 
 
-        public UserEntity(EmailObject email, string password)
+        public UserEntity(Email email, string password)
         {
 
             if (password.Length < 8)

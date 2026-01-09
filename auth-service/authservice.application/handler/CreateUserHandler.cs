@@ -41,7 +41,7 @@ namespace auth_service.authservice.application.handler
             {
                 Id = Guid.NewGuid(),
                 Username = register.Username,
-                Email = new domain.value_object.EmailObject(register.Email),
+                Email = new domain.value_object.Email(register.Email),
                 PasswordHash = hashedPassword,
                 PasswordSalt = salt,
                 IsActive = true,
