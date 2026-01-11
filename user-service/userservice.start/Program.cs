@@ -2,12 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using user_service.userservice.api.GlobalExceptionMiddleware;
-using user_service.userservice.application.interfaceApplications;
-using user_service.userservice.domain.interfaces;
 using user_service.userservice.infastructure.DBcontextService;
-using user_service.userservice.infastructure.other;
-using user_service.userservice.infastructure.Repositories;
 
 namespace user_service.userservice.start
 {
@@ -43,19 +38,10 @@ namespace user_service.userservice.start
 
 
 
-            builder.Services.AddTransient<IUserRepositories, UserRepositories>();
-            builder.Services.AddTransient<IValidationJWT, ValidationJWT>();
-            builder.Services.AddTransient<IAddUserApplication, AddUserApplication>();
-            builder.Services.AddTransient<IAddAddressForUserApplication, AddAddressForUserApplication>();
-
-
-
             builder.Services.AddControllers();
 
             var app = builder.Build();
             app.UseRouting();
-            app.UseMiddleware<GlobalExceptions>();  // đăng ký vào middleware
-
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
