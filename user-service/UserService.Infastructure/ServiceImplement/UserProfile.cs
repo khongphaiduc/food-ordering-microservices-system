@@ -1,0 +1,45 @@
+﻿using Microsoft.EntityFrameworkCore;
+using user_service.userservice.infastructure.DBcontextService;
+using user_service.UserService.Application.DTOS;
+using user_service.UserService.Application.Services;
+using user_service.UserService.Domain.Aggregates;
+using user_service.UserService.Domain.Interfaces;
+using user_service.UserService.Domain.ValueObjects;
+
+namespace user_service.UserService.Infastructure.ServiceImplement
+{
+    public class UserProfile : IUserProfile
+    {
+        private readonly FoodUsersContext _db;
+        private readonly IUserRepository _iUserRepositoty;
+
+        public UserProfile(FoodUsersContext foodUsersContext, IUserRepository userRepository)
+        {
+            _db = foodUsersContext;
+            _iUserRepositoty = userRepository;
+        }
+
+        public async Task<bool> UserProfilHandle(RequestUserProfile requestUserProfile)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(s => s.Id == requestUserProfile.Id);
+
+
+            var checkEmail = await _iUserRepositoty.IsEmailExistsAsync(requestUserProfile.Email);
+
+            if (checkEmail)
+            {
+                return false;
+            }
+
+            if (user == null)
+            {
+                var newUser = UserAggregate.CreateNewUser(requestUserProfile.FullName, new Email(requestUserProfile.Email), new PhoneNumber(requestUserProfile.PhoneNumber));
+                return await _iUserRepositoty.AddNewUserAsync(newUser);
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+}

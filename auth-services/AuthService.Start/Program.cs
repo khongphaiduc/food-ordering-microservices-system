@@ -3,6 +3,7 @@ using auth_services.AuthService.Application.Interfaces;
 using auth_services.AuthService.Application.Service;
 using auth_services.AuthService.Domain.Interface;
 using auth_services.AuthService.Infastructure.DbContextAuth;
+using auth_services.AuthService.Infastructure.RabbitMQs.Producer;
 using auth_services.AuthService.Infastructure.Reposistory;
 using auth_services.AuthService.Infastructure.Security;
 using auth_services.AuthService.Infastructure.ServiceImpelemt;
@@ -68,7 +69,7 @@ namespace auth_services.AuthService.Start
             builder.Services.AddScoped<IGanarateTokenJWT, GanarateAccessTokenJWT>();
             builder.Services.AddScoped<IGanarateTokenJWT, GanarateRefresheTokenJWT>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
+            builder.Services.AddScoped<RabbitMQProducer>();
 
 
             builder.Services.AddControllers();

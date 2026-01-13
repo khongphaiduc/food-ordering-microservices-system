@@ -1,6 +1,7 @@
 ﻿using RabbitMQ.Client;
 using System.Text.Json;
 using System.Text;
+using auth_services.AuthService.Infastructure.IntegrationContracts;
 
 namespace auth_services.AuthService.Infastructure.RabbitMQs.Producer
 {
@@ -15,7 +16,7 @@ namespace auth_services.AuthService.Infastructure.RabbitMQs.Producer
         }
 
 
-        public async Task SendMessage(object message, string routingKey)
+        public async Task SendMessage(UserInfoDTO message, string routingKey)
         {
 
             var factory = new ConnectionFactory

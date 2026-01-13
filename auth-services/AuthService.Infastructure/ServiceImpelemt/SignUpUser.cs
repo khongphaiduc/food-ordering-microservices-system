@@ -4,6 +4,8 @@ using auth_services.AuthService.Application.Service;
 using auth_services.AuthService.Domain.Aggregate;
 using auth_services.AuthService.Domain.Interface;
 using auth_services.AuthService.Domain.ValueObject;
+using auth_services.AuthService.Infastructure.IntegrationContracts;
+using auth_services.AuthService.Infastructure.RabbitMQs.Producer;
 
 namespace auth_services.AuthService.Infastructure.ServiceImpelemt
 {
@@ -12,12 +14,16 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
         private readonly IGenarateSalt _iGenarateSalt;
         private readonly IHashPassword _iHashPassword;
         private readonly IUserRepository _iUserRepository;
+        private readonly RabbitMQProducer _rabbitMQ;
+        private readonly IConfiguration _iConfig;
 
-        public SignUpUser(IGenarateSalt genarateSalt, IHashPassword hashPassword, IUserRepository userRepository)
+        public SignUpUser(IGenarateSalt genarateSalt, IHashPassword hashPassword, IUserRepository userRepository, RabbitMQProducer rabbitMQProducer,IConfiguration configuration)
         {
             _iGenarateSalt = genarateSalt;
             _iHashPassword = hashPassword;
             _iUserRepository = userRepository;
+            _rabbitMQ = rabbitMQProducer;
+            _iConfig = configuration;
         }
 
         public async Task<bool> Execute(RequestCreateNewUser user)
@@ -30,8 +36,23 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
             var hashedPassword = _iHashPassword.HandleHashPassword(user.Password, salt);
             // aggregate root
             var userAggregate = UserAggregate.CreateNewUser(new FullNameOfUser(user.UserName), new Email(user.Email), hashedPassword, salt);
-            return await _iUserRepository.AddNewUser(userAggregate);  // thêm user
 
+            var result = await _iUserRepository.AddNewUser(userAggregate);
+
+            if (result)
+            {
+                await _rabbitMQ.SendMessage(new UserInfoDTO
+                {
+                    Id = userAggregate.Id,
+                    Email = userAggregate.Email.EmailAdress,
+                    Name = userAggregate.Email.EmailAdress
+                }, _iConfig["RabbitMQ_Side_Auth:Queue:UserInfo:RoutingKey"]!);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

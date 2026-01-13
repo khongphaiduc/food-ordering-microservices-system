@@ -3,6 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using user_service.userservice.infastructure.DBcontextService;
+using user_service.UserService.Application.Services;
+using user_service.UserService.Domain.Interfaces;
+using user_service.UserService.Infastructure.RabbitMQConsumers;
+using user_service.UserService.Infastructure.Repository;
+using user_service.UserService.Infastructure.ServiceImplement;
 
 namespace user_service.userservice.start
 {
@@ -37,6 +42,10 @@ namespace user_service.userservice.start
             });
 
 
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserProfile, UserProfile>();
+            builder.Services.AddHostedService<UserInfoConsumer>();
+
 
             builder.Services.AddControllers();
 
@@ -47,7 +56,7 @@ namespace user_service.userservice.start
             app.UseAuthentication();
             app.UseAuthorization();
 
-          
+
             app.MapControllers();
 
             app.Run();

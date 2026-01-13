@@ -37,7 +37,7 @@ namespace auth_services.AuthService.API.AuthControllers
             }
             else
             {
-                return BadRequest("Fail");
+                return BadRequest("The account already exists");
             }
 
         }
