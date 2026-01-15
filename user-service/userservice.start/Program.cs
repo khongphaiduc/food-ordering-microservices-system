@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using user_service.userservice.infastructure.DBcontextService;
+using user_service.UserService.API.gRPC;
 using user_service.UserService.Application.Services;
 using user_service.UserService.Domain.Interfaces;
 using user_service.UserService.Infastructure.RabbitMQConsumers;
 using user_service.UserService.Infastructure.Repository;
 using user_service.UserService.Infastructure.ServiceImplement;
+using UserService.API.Protos;
+
 
 namespace user_service.userservice.start
 {
@@ -41,19 +44,25 @@ namespace user_service.userservice.start
                 };
             });
 
-
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserProfile, UserProfile>();
             builder.Services.AddHostedService<UserInfoConsumer>();
 
 
             builder.Services.AddControllers();
+            builder.Services.AddGrpc();// 1. Add gRPC
 
 
 
             var app = builder.Build();
-            app.UseRouting();
 
+            app.MapGrpcService<UserInfoSerivce>();// 2. Map gRPC service
+
+
+            app.MapGet("/", () => "gRPC Server running");// endpoint
+
+            app.UseRouting();
+            
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();

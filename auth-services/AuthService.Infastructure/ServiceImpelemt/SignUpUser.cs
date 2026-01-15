@@ -17,7 +17,7 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
         private readonly RabbitMQProducer _rabbitMQ;
         private readonly IConfiguration _iConfig;
 
-        public SignUpUser(IGenarateSalt genarateSalt, IHashPassword hashPassword, IUserRepository userRepository, RabbitMQProducer rabbitMQProducer,IConfiguration configuration)
+        public SignUpUser(IGenarateSalt genarateSalt, IHashPassword hashPassword, IUserRepository userRepository, RabbitMQProducer rabbitMQProducer, IConfiguration configuration)
         {
             _iGenarateSalt = genarateSalt;
             _iHashPassword = hashPassword;
@@ -41,6 +41,7 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
 
             if (result)
             {
+                // send message into  rabbbitMQ 
                 await _rabbitMQ.SendMessage(new RegisterNotificationMessage
                 {
                     Email = userAggregate.Email.EmailAdress,

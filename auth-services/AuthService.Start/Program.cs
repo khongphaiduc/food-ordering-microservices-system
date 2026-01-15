@@ -11,6 +11,7 @@ using auth_services.AuthService.Infastructure.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using UserService.API.Protos;
 
 namespace auth_services.AuthService.Start
 {
@@ -55,6 +56,15 @@ namespace auth_services.AuthService.Start
                     IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key:RefreshToken"]!))
                 };
             });
+
+
+
+            builder.Services.AddGrpcClient<UserInfoGrpc.UserInfoGrpcClient>(s =>
+            {
+                s.Address = new Uri("https://localhost:7199");
+            });
+
+
 
             builder.Services.AddHttpContextAccessor();   // cung cấp httcontext trong service
 
