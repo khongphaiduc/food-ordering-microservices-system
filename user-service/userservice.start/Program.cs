@@ -49,12 +49,15 @@ namespace user_service.userservice.start
 
             builder.Services.AddControllers();
 
+
+
             var app = builder.Build();
             app.UseRouting();
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
+
 
 
             app.MapControllers();

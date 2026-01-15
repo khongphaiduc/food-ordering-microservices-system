@@ -41,12 +41,12 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
 
             if (result)
             {
-                await _rabbitMQ.SendMessage(new UserInfoDTO
+                await _rabbitMQ.SendMessage(new RegisterNotificationMessage
                 {
-                    Id = userAggregate.Id,
                     Email = userAggregate.Email.EmailAdress,
-                    Name = userAggregate.Email.EmailAdress
-                }, _iConfig["RabbitMQ_Side_Auth:Queue:UserInfo:RoutingKey"]!);
+                    Name = userAggregate.Email.EmailAdress,
+                    TypeService = "Email"
+                }, _iConfig["RabbitMQ_Side_Auth:Queue:Notification_Email:RoutingKey"]!);
                 return true;
             }
             else

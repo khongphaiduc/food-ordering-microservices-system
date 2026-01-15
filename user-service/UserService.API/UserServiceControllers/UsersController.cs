@@ -25,5 +25,6 @@ namespace user_service.UserService.API.UserServiceControllers
 
             return Ok(result);
         }
+
     }
 }

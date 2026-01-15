@@ -1,3 +1,7 @@
+using notification_service.Notifications.EmailSerivce;
+using notification_service.Notifications.Services;
+using notification_service.Worker.EmailWorker;
+
 namespace notification_service
 {
     public class Program
@@ -6,21 +10,17 @@ namespace notification_service
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
 
+
+            builder.Services.AddSingleton<INotifications, Emails>(); 
+
+            builder.Services.AddHostedService<EmailConsumer>();
+
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }

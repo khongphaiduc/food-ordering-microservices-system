@@ -16,7 +16,7 @@ namespace auth_services.AuthService.Infastructure.RabbitMQs.Producer
         }
 
 
-        public async Task SendMessage(UserInfoDTO message, string routingKey)
+        public async Task SendMessage(RegisterNotificationMessage message, string routingKey)
         {
 
             var factory = new ConnectionFactory
@@ -88,7 +88,7 @@ namespace auth_services.AuthService.Infastructure.RabbitMQs.Producer
                     { "service", "Auth-Service" },
                     { "message_type", "SendEmail" },
                     { "created_at", DateTime.UtcNow.ToString("O") }
-                }
+                }!
             };
 
 

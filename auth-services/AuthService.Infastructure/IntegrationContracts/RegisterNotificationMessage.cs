@@ -1,12 +1,13 @@
 ﻿namespace auth_services.AuthService.Infastructure.IntegrationContracts
 {
-    public class UserInfoDTO
+    public class RegisterNotificationMessage
     {
-        public Guid Id { get; set; }
 
         public string Name { get; set; }
 
         public string Email { get; set; }
+
+        public string TypeService { get; set; } = "Email";
 
     }
 }
