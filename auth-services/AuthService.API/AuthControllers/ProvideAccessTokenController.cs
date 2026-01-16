@@ -38,6 +38,7 @@ namespace auth_services.AuthService.API.AuthControllers
         }
 
 
+        // test call gRPC user service
         [AllowAnonymous]
         [HttpGet("testCreate")]
         public IActionResult Index()

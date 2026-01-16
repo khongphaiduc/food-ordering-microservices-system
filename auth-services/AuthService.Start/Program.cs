@@ -1,4 +1,5 @@
-﻿using auth_services.AuthService.API.Middlwares;
+﻿using auth_services.AuthService.API.gRPCs;
+using auth_services.AuthService.API.Middlwares;
 using auth_services.AuthService.Application.Interfaces;
 using auth_services.AuthService.Application.Service;
 using auth_services.AuthService.Domain.Interface;
@@ -75,11 +76,14 @@ namespace auth_services.AuthService.Start
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IProvideAccessToken, ProvideAccessToken>();
             builder.Services.AddScoped<IUserLogOut, UserLogOut>();
+            builder.Services.AddSingleton<UserServicesClient>();
             // token
             builder.Services.AddScoped<IGanarateTokenJWT, GanarateAccessTokenJWT>();
             builder.Services.AddScoped<IGanarateTokenJWT, GanarateRefresheTokenJWT>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<RabbitMQProducer>();
+
+
 
 
             builder.Services.AddControllers();

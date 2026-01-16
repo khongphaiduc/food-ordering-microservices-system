@@ -1,4 +1,5 @@
-﻿using auth_services.AuthService.Application.DTOS;
+﻿using auth_services.AuthService.API.gRPCs;
+using auth_services.AuthService.Application.DTOS;
 using auth_services.AuthService.Application.Service;
 using auth_services.AuthService.Infastructure.DbContextAuth;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using UserService.API.Protos;
 
 namespace auth_services.AuthService.API.AuthControllers
 {
@@ -17,12 +19,14 @@ namespace auth_services.AuthService.API.AuthControllers
         private readonly ISignUpUser _iUserSignUp;
         private readonly ICheckLogin _iUserLogIn;
         private readonly IUserLogOut _iUserLogOut;
+    
 
         public UsersController(ISignUpUser signUpUser, ICheckLogin checkLogin, IUserLogOut userLogOut)
         {
             _iUserSignUp = signUpUser;
             _iUserLogIn = checkLogin;
             _iUserLogOut = userLogOut;
+           
         }
 
 
@@ -33,6 +37,7 @@ namespace auth_services.AuthService.API.AuthControllers
 
             if (result)
             {
+             
                 return Created(" ", new { message = "Create New User Successful" });
             }
             else

@@ -1,24 +1,29 @@
-﻿using notification_service.Notifications.DTOS;
+﻿using notification_service.Notification.Domain.Interface;
+using notification_service.Notifications.DTOS;
 using notification_service.Notifications.Services;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text.Json;
 
-namespace notification_service.Worker.EmailWorker
+namespace notification_service.Notification.Infastructure.Worker.EmailWorker
 {
     public class EmailConsumer : BackgroundService
     {
         private readonly IConfiguration _iConfig;
         private readonly IEnumerable<INotifications> _iNotification;
         private readonly ILogger<EmailConsumer> _logger;
+     
+        private readonly IServiceScopeFactory _scopeFactory;
         private IChannel _channel;
         private IConnection _connection;
 
-        public EmailConsumer(IConfiguration configuration, IEnumerable<INotifications> notifications, ILogger<EmailConsumer> logger)
+        public EmailConsumer(IConfiguration configuration, IEnumerable<INotifications> notifications, ILogger<EmailConsumer> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _iConfig = configuration;
             _iNotification = notifications;
             _logger = logger;
+          
+            _scopeFactory = serviceScopeFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -76,8 +81,15 @@ namespace notification_service.Worker.EmailWorker
                             {
                                 var resultSendEmail = await service.SendRegisterAccount(requestSendNotificaion);
 
+
+
                                 if (resultSendEmail)  // gửi thành công
                                 {
+                                    //using var scope = _scopeFactory.CreateScope(); // tạo scope mới
+                                    //var _iNotificationRecord = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
+
+                                    //var resultRecord = await _iNotificationRecord.AddNewRecordNotification(requestSendNotificaion);
+                                    //_logger.LogInformation($"Record Infomation at Email Consumer : {resultRecord}");
                                     await _channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
                                 }
                                 else

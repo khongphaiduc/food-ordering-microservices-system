@@ -3,7 +3,7 @@ using notification_service.Notifications.Services;
 using System.Net.Mail;
 using System.Net;
 
-namespace notification_service.Notifications.EmailSerivce
+namespace notification_service.Notification.Application.Services
 {
     public class Emails : INotifications
     {
