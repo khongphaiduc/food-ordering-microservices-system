@@ -7,6 +7,7 @@ using auth_services.AuthService.Domain.Interface;
 using auth_services.AuthService.Domain.ValueObject;
 using auth_services.AuthService.Infastructure.IntegrationContracts;
 using auth_services.AuthService.Infastructure.RabbitMQs.Producer;
+using Grpc.Core;
 using UserService.API.Protos;
 
 namespace auth_services.AuthService.Infastructure.ServiceImpelemt
@@ -43,14 +44,37 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
 
             var result = await _iUserRepository.AddNewUser(userAggregate);
 
+
             // call gRPC user Client
-            await _userClient.CreateNewInformationUserAsync(new CreateNewInformationUserRequest
-            {
-                Id = userAggregate.Id.ToString(),
-                Name = userAggregate.Username.Value,
-                Email = userAggregate.Email.EmailAdress, 
-                Phone = "0000000000"            // phone mặc dịnhd
-            });
+            for (int i = 0; i < 3; i++)
+            {        //retry
+
+                try
+                {
+                    var resultCallUserClient = await _userClient.CreateNewInformationUserAsync(new CreateNewInformationUserRequest
+                    {
+                        Id = userAggregate.Id.ToString(),
+                        Name = userAggregate.Username.Value,
+                        Email = userAggregate.Email.EmailAdress,
+                        Phone = "0000000000"            // phone mặc dịnhd
+                    });
+
+                    if (resultCallUserClient.IsSuccess)
+                    {
+                        break;
+                    }
+                }
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable || ex.StatusCode == StatusCode.DeadlineExceeded)
+                {
+
+                    if (i == 2)
+                    {
+                        throw;  // sau 3 lần retry vẫn lỗi thì ném exception ra ngoài
+                    }
+                    await Task.Delay(200);    // ngăn giữa các lần retry
+                }
+
+            }
 
             if (result)
             {
