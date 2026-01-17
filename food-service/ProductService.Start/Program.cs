@@ -1,4 +1,5 @@
 using food_service.productservice.infastructure.ProductDbContexts;
+using food_service.ProductService.API.Middlwares;
 using food_service.ProductService.Application.Service;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Infastructure.ImplementService;
@@ -38,11 +39,11 @@ namespace food_service.ProductService.Start
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IGetListProduct, GetListProduct>();
             builder.Services.AddScoped<IViewDetailProduct, ViewDetailProduct>();
-
+            builder.Services.AddScoped<ICreateNewProduct, CreateNewProduct>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            app.UseMiddleware<CustomGlobalException>();
 
             app.UseHttpsRedirection();
 
