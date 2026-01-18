@@ -3,6 +3,7 @@ using food_service.ProductService.API.Middlwares;
 using food_service.ProductService.Application.Service;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Infastructure.ImplementService;
+using food_service.ProductService.Infastructure.RedisService.RedisInterface;
 using food_service.ProductService.Infastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +44,11 @@ namespace food_service.ProductService.Start
             builder.Services.AddScoped<IUpdateCategory, UpdateCategory>();
             builder.Services.AddScoped<ICreateNewCategory, CreateNewCategory>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+
+            //redis 
+
+            builder.Services.AddTransient<IRedisLockService, RedisLockService>();
 
             builder.Services.AddStackExchangeRedisCache(options =>
             {
