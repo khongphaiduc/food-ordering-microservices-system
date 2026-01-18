@@ -34,6 +34,7 @@ namespace food_service.ProductService.API.Middlwares
             context.Response.StatusCode = ex switch
             {
                 ProductNotFoundException => StatusCodes.Status404NotFound,
+                NotFoundCategoryException => StatusCodes.Status404NotFound,
                 _ => StatusCodes.Status500InternalServerError
             };
 

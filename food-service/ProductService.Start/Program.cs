@@ -40,6 +40,15 @@ namespace food_service.ProductService.Start
             builder.Services.AddScoped<IGetListProduct, GetListProduct>();
             builder.Services.AddScoped<IViewDetailProduct, ViewDetailProduct>();
             builder.Services.AddScoped<ICreateNewProduct, CreateNewProduct>();
+            builder.Services.AddScoped<IUpdateCategory, UpdateCategory>();
+            builder.Services.AddScoped<ICreateNewCategory, CreateNewCategory>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration["RedisAddress"];
+                options.InstanceName = "FoodTrungDuc";
+            });
 
             var app = builder.Build();
 

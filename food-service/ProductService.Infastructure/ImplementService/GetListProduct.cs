@@ -3,6 +3,7 @@ using food_service.ProductService.Application.DTOs.Request;
 using food_service.ProductService.Application.DTOs.Response;
 using food_service.ProductService.Application.Service;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Net.WebSockets;
 
 namespace food_service.ProductService.Infastructure.ImplementService
@@ -10,15 +11,18 @@ namespace food_service.ProductService.Infastructure.ImplementService
     public class GetListProduct : IGetListProduct
     {
         private readonly FoodProductsDbContext _db;
+        private readonly IDistributedCache _redisCatch;
 
-        public GetListProduct(FoodProductsDbContext foodProductsDbContext)
+        public GetListProduct(FoodProductsDbContext foodProductsDbContext, IDistributedCache _RedisCache)
         {
             _db = foodProductsDbContext;
+            _redisCatch = _RedisCache;
         }
 
         // search và phân trang
         public async Task<List<ProductDTO>> ExecuteAsync(RequestGetListProduct request)
         {
+
             var numberSkip = (request.PageIndex - 1) * request.PageSize;
 
             var query = _db.Products.AsQueryable();

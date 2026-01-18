@@ -6,25 +6,68 @@ using System.Threading.Tasks;
 
 namespace food_service.ProductService.API.Controllers
 {
-    [Route("api/products")]
+    [Route("api/admin")]
     [ApiController]
     public class AdminManagementController : ControllerBase
     {
+        private readonly ICreateNewCategory _iAddNewCategory;
         private readonly ICreateNewProduct _iAddNewProduct;
+        private readonly IUpdateCategory _iUpdateCategory;
 
-        public AdminManagementController(ICreateNewProduct createNewProduct)
+        public AdminManagementController(ICreateNewProduct createNewProduct, ICreateNewCategory createNewCategory, IUpdateCategory updateCategory)
         {
+            _iAddNewCategory = createNewCategory;
             _iAddNewProduct = createNewProduct;
+            _iUpdateCategory = updateCategory;
         }
 
 
         // đã test
-        [HttpPost]
+        [HttpPost("products")]
         public async Task<ActionResult> CreateNewProduct([FromBody] CreateNewProducDTO request)
         {
             var result = await _iAddNewProduct.ExcuteAsync(request);
-            return Ok(result);
+            if (result)
+            {
+                return Ok(new { message = "Create new product successful" });
+            }
+            else
+            {
+                return BadRequest(new { message = "Failed to create product.", time = DateTime.Now });
+            }
         }
+
+        //tested
+        [HttpPost("categories")]
+        public async Task<IActionResult> CreateNewCategory([FromBody] CreateNewCategoryDTO request)
+        {
+            var result = await _iAddNewCategory.ExcuteAsync(request);
+            if (result)
+            {
+                return Ok(new { message = "Create new category successful" });
+            }
+            else
+            {
+                return BadRequest(new { message = "Failed to create category.", time = DateTime.Now });
+            }
+        }
+
+        // tested
+        [HttpPut("categories")]
+        public async Task<IActionResult> UpdateCategory([FromBody] UpdateCategoryDTO request)
+        {
+            var result = await _iUpdateCategory.ExcuteAsync(request);
+
+            if (result)
+            {
+                return Ok(new { message = "Update category successful" });
+            }
+            else
+            {
+                return BadRequest(new { message = "Failed to update category.", time = DateTime.Now });
+            }
+        }
+
 
     }
 }
