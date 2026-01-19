@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using search_service.Models;
 using search_service.SearchService.Application.Interface;
 using search_service.SearchService.Infastructure.ImplementServices;
+using search_service.SearchService.Infastructure.Redis.Interface;
+using search_service.SearchService.Infastructure.Redis.Service;
+using StackExchange.Redis;
 
 namespace search_service
 {
@@ -19,14 +22,19 @@ namespace search_service
                 options.UseNpgsql(builder.Configuration["SQLPRODUCT"]);
             });
 
-
-
+            builder.Services.AddStackExchangeRedisCache(options =>          // AddStackExchangeRedisCache sẽ map IDistributeCatche
+            {
+                options.Configuration = builder.Configuration["HostRedis"];
+                options.InstanceName = "ListProduct";
+            });
+            builder.Services.AddScoped<IRedisLockService, RedisLockService>();
             builder.Services.AddScoped<IGetListProduct, GetListProduct>();
             builder.Services.AddScoped<ILoadFullProduct, LoadFullProduct>();
+            builder.Services.AddScoped<IElasticsearch, Elasticsearch>();
 
 
-
-            builder.Services.AddControllers();
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+                ConnectionMultiplexer.Connect(builder.Configuration["HostRedis"]!));
 
 
             // elasticsearch
@@ -38,7 +46,7 @@ namespace search_service
 
 
 
-
+            builder.Services.AddControllers();
             var app = builder.Build();
 
 
