@@ -59,7 +59,7 @@ namespace auth_services.AuthService.Start
             });
 
 
-
+            // gRPC
             builder.Services.AddGrpcClient<UserInfoGrpc.UserInfoGrpcClient>(s =>
             {
                 s.Address = new Uri("https://localhost:7199");
