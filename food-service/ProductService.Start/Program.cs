@@ -1,13 +1,15 @@
-using food_service.productservice.infastructure.ProductDbContexts;
+using food_service.Models;
 using food_service.ProductService.API.Middlwares;
 using food_service.ProductService.Application.Service;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Infastructure.ImplementService;
+using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using food_service.ProductService.Infastructure.RedisService.RedisInterface;
 using food_service.ProductService.Infastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace food_service.ProductService.Start
 {
@@ -24,7 +26,8 @@ namespace food_service.ProductService.Start
 
             builder.Services.AddDbContext<FoodProductsDbContext>(options =>
             {
-                options.UseNpgsql(builder.Configuration["SQLFOOD_PRODUCTS"]!);
+                options.UseNpgsql("Host=localhost;Port=5432;Database=food_products;Username=postgres;Password=123");
+                // options.UseNpgsql(builder.Configuration["SQLFOOD_PRODUCTS"]!);
             });
 
 
@@ -44,6 +47,7 @@ namespace food_service.ProductService.Start
             builder.Services.AddScoped<IUpdateCategory, UpdateCategory>();
             builder.Services.AddScoped<ICreateNewCategory, CreateNewCategory>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<FoodProducer>();
 
 
             //redis 
@@ -55,6 +59,11 @@ namespace food_service.ProductService.Start
                 options.Configuration = builder.Configuration["RedisAddress"];
                 options.InstanceName = "FoodTrungDuc";
             });
+
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+              ConnectionMultiplexer.Connect(builder.Configuration["RedisAddress"]!));
+
+
 
             var app = builder.Build();
 

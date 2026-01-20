@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using food_service.productservice.infastructure.ProductDbContexts;
+using food_service.Models;
 
 #nullable disable
 
 namespace food_service.Migrations
 {
     [DbContext(typeof(FoodProductsDbContext))]
-    partial class FoodProductsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260120085542_v1")]
+    partial class v1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,7 +67,32 @@ namespace food_service.Migrations
                     b.ToTable("categories", (string)null);
                 });
 
-            modelBuilder.Entity("food_service.Models.ProductDTO", b =>
+            modelBuilder.Entity("food_service.Models.OutBoxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsProcessd")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OutBoxMessage");
+                });
+
+            modelBuilder.Entity("food_service.Models.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,7 +151,7 @@ namespace food_service.Migrations
                     b.ToTable("products", (string)null);
                 });
 
-            modelBuilder.Entity("food_service.Models.ProductImageDTO", b =>
+            modelBuilder.Entity("food_service.Models.ProductImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -154,7 +182,7 @@ namespace food_service.Migrations
                     b.ToTable("product_images", (string)null);
                 });
 
-            modelBuilder.Entity("food_service.Models.ProductVariantEntity", b =>
+            modelBuilder.Entity("food_service.Models.ProductVariant", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -203,7 +231,7 @@ namespace food_service.Migrations
                     b.ToTable("product_variants", (string)null);
                 });
 
-            modelBuilder.Entity("food_service.Models.ProductDTO", b =>
+            modelBuilder.Entity("food_service.Models.Product", b =>
                 {
                     b.HasOne("food_service.Models.Category", "Category")
                         .WithMany("Products")
@@ -214,28 +242,28 @@ namespace food_service.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("food_service.Models.ProductImageDTO", b =>
+            modelBuilder.Entity("food_service.Models.ProductImage", b =>
                 {
-                    b.HasOne("food_service.Models.ProductDTO", "ProductDTO")
-                        .WithMany("ProductImagesEntity")
+                    b.HasOne("food_service.Models.Product", "Product")
+                        .WithMany("ProductImages")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_image_product");
 
-                    b.Navigation("ProductDTO");
+                    b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("food_service.Models.ProductVariantEntity", b =>
+            modelBuilder.Entity("food_service.Models.ProductVariant", b =>
                 {
-                    b.HasOne("food_service.Models.ProductDTO", "ProductDTO")
+                    b.HasOne("food_service.Models.Product", "Product")
                         .WithMany("ProductVariants")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_variant_product");
 
-                    b.Navigation("ProductDTO");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("food_service.Models.Category", b =>
@@ -243,9 +271,9 @@ namespace food_service.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("food_service.Models.ProductDTO", b =>
+            modelBuilder.Entity("food_service.Models.Product", b =>
                 {
-                    b.Navigation("ProductImagesEntity");
+                    b.Navigation("ProductImages");
 
                     b.Navigation("ProductVariants");
                 });

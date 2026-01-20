@@ -1,9 +1,9 @@
-﻿using food_service.productservice.infastructure.Models;
-using food_service.productservice.infastructure.ProductDbContexts;
+﻿using food_service.Models;
 using food_service.ProductService.API.GlobalExceptions;
 using food_service.ProductService.Domain.Aggragate;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Domain.ValueOject;
+using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using Microsoft.EntityFrameworkCore;
 
 namespace food_service.ProductService.Infastructure.Repositories
@@ -11,25 +11,46 @@ namespace food_service.ProductService.Infastructure.Repositories
     public class CategoryRepository : ICategoryRepository
     {
         private readonly FoodProductsDbContext _db;
+        private readonly FoodProducer _producerFood;
 
-        public CategoryRepository(FoodProductsDbContext foodProductsDbContext)
+        public CategoryRepository(FoodProductsDbContext foodProductsDbContext, FoodProducer foodProducer, ILogger<CategoryRepository> logger)
         {
             _db = foodProductsDbContext;
+            _producerFood = foodProducer;
         }
 
         public async Task<bool> AddNewCategory(CategoryAggregate NewCategoty)
         {
-            var CategoryModel = new Category
+            var transaction = await _db.Database.BeginTransactionAsync();
+            try
             {
-                Id = NewCategoty.Id,
-                Name = NewCategoty.Name.Value,
-                Description = NewCategoty.Description,
-                IsActive = NewCategoty.IsActive,
-                CreatedAt = NewCategoty.CreateAt,
-                UpdatedAt = NewCategoty.UpdateAt,
-            };
-            await _db.Categories.AddAsync(CategoryModel);
-            return await _db.SaveChangesAsync() > 0;
+                var CategoryModel = new Category
+                {
+                    Id = NewCategoty.Id,
+                    Name = NewCategoty.Name.Value,
+                    Description = NewCategoty.Description,
+                    IsActive = NewCategoty.IsActive,
+                    CreatedAt = NewCategoty.CreateAt,
+                    UpdatedAt = NewCategoty.UpdateAt,
+                };
+
+               
+                await _db.Categories.AddAsync(CategoryModel);
+                await _db.SaveChangesAsync();
+
+
+
+
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+
         }
 
         public async Task<CategoryAggregate> GetCategoryById(Guid Id)
@@ -49,10 +70,11 @@ namespace food_service.ProductService.Infastructure.Repositories
             var category = await _db.Categories.Where(s => s.Id == updateCategoty.Id).FirstOrDefaultAsync();
 
             if (category != null)
-            {  category.Name = updateCategoty.Name.Value;
+            {
+                category.Name = updateCategoty.Name.Value;
                 category.Description = updateCategoty.Description;
                 category.IsActive = updateCategoty.IsActive;
-              
+
             }
             return await _db.SaveChangesAsync() > 0;
         }

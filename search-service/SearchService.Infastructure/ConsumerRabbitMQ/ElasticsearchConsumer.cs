@@ -41,8 +41,7 @@ namespace search_service.SearchService.Infastructure.ConsumerRabbitMQ
                           exclusive: false,
                           autoDelete: false,
                           arguments: null
-                  );
-
+                );
 
                 await _channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
 
@@ -73,8 +72,6 @@ namespace search_service.SearchService.Infastructure.ConsumerRabbitMQ
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Temporary error");
-
-
                         await _channel.BasicNackAsync(ea.DeliveryTag, false, true);
                     }
                 };

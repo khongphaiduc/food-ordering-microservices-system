@@ -1,41 +1,91 @@
-﻿using food_service.productservice.infastructure.Models;
-using food_service.productservice.infastructure.ProductDbContexts;
+﻿using food_service.Models;
+//using food_service.productservice.infastructure.Models;
 using food_service.ProductService.API.GlobalExceptions;
+using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Domain.Aggragate;
 using food_service.ProductService.Domain.Entities;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Domain.ValueOject;
+using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace food_service.ProductService.Infastructure.Repositories
 {
     public class ProductRepository : IProductRepository
     {
         private readonly FoodProductsDbContext _db;
+        private readonly FoodProducer _workerFood;
+        private readonly IOutBoxPatternProduct _outBoxpattern;
+        private readonly ILogger<ProductRepository> _logger;
 
-        public ProductRepository(FoodProductsDbContext foodProductsDbContext)
+        public ProductRepository(FoodProductsDbContext foodProductsDbContext, FoodProducer foodProducer, IOutBoxPatternProduct outBoxPatternProduct, ILogger<ProductRepository> logger)
         {
             _db = foodProductsDbContext;
+            _workerFood = foodProducer;
+            _outBoxpattern = outBoxPatternProduct;
+            _logger = logger;
         }
 
         public async Task<bool> AddProductAsync(ProductAggregate product)
         {
+            var transaction = await _db.Database.BeginTransactionAsync();
 
-            var producModel = new Product
+            try
             {
-                Id = product.Id,
-                CategoryId = product.CategoryId,
-                Name = product.NameProduct.Value,
-                Description = product.Description,
-                Price = product.PriceProduct.Value,
-                IsAvailable = product.IsAvailable,
-                IsDeleted = product.IsDeleted,
-                CreatedAt = product.CreatedAt,
-                UpdatedAt = product.UpdatedAt,
-            };
+                var producModel = new Product
+                {
+                    Id = product.Id,
+                    CategoryId = product.CategoryId,
+                    Name = product.NameProduct.Value,
+                    Description = product.Description,
+                    Price = product.PriceProduct.Value,
+                    IsAvailable = product.IsAvailable,
+                    IsDeleted = product.IsDeleted,
+                    CreatedAt = product.CreatedAt,
+                    UpdatedAt = product.UpdatedAt,
+                };
 
-            await _db.Products.AddAsync(producModel);
-            return await _db.SaveChangesAsync() > 0;
+
+                var productDTP = new ProductInternalDTO
+                {
+                    Id = producModel.Id,
+                    Description = producModel.Description,
+                    IdCategory = producModel.CategoryId,
+                    Name = producModel.Name,
+                    Price = producModel.Price,
+                    UpdateAt = producModel.UpdatedAt,
+                    CreateAt = producModel.CreatedAt,
+                };
+
+                // ghi vào base 
+                await _db.Products.AddAsync(producModel);
+
+
+                // ghi vào OutBoxMessage
+                await _outBoxpattern.CreateNewMessage(new Application.DTOs.Internals.OutboxMessageDTO
+                {
+                    Id = Guid.NewGuid(),
+                    Type = "ProductCreated",
+                    PayLoad = JsonSerializer.Serialize(productDTP),
+                    IsProcesced = false,
+                    CreateAt = DateTime.UtcNow,
+                });
+
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                _logger.LogInformation("write new product into OutBoxTable Successful");
+                return true;
+            }
+            catch (Exception s)
+            {
+
+                await transaction.RollbackAsync();
+                _logger.LogInformation($"Error in Repository Create new Product: {s}");
+                return false;
+            }
+
         }
 
         public async Task<ProductAggregate> GetProductByIdAsync(Guid productId)
@@ -131,6 +181,7 @@ namespace food_service.ProductService.Infastructure.Repositories
                         variantToUpdate.UpdatedAt = DateTime.UtcNow;
                     }
                 }
+
                 await _db.SaveChangesAsync();
             }
 

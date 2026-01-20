@@ -45,7 +45,6 @@ namespace search_service.SearchService.Infastructure.ImplementServices
                 }).ToList()
             };
 
-
             var result = await _elasticsearchClient.IndexAsync<ProductDoc>(productDocument, s => s.Index("products").Id(productDocument.Id));
 
         }

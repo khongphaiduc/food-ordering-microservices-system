@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using food_service.productservice.infastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace food_service.productservice.infastructure.ProductDbContexts;
+namespace food_service.Models;
 
 public partial class FoodProductsDbContext : DbContext
 {
-    public FoodProductsDbContext()
-    {
-    }
+
 
     public FoodProductsDbContext(DbContextOptions<FoodProductsDbContext> options)
         : base(options)
@@ -23,6 +20,8 @@ public partial class FoodProductsDbContext : DbContext
     public virtual DbSet<ProductImage> ProductImages { get; set; }
 
     public virtual DbSet<ProductVariant> ProductVariants { get; set; }
+
+    public virtual DbSet<OutBoxMessage> OutBoxMessages { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

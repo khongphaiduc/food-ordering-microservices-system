@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace food_service.productservice.infastructure.Models;
+namespace food_service.Models;
 
 public partial class ProductVariant
 {
