@@ -27,10 +27,10 @@ namespace search_service.SearchService.Infastructure.ImplementServices
                     Name = s.Name,
                     Price = s.Price,
                     Description = s.Description,
-                    CategoryID = s.CategoryId,
+                    IdCategory = s.CategoryId,
                     CreateAt = s.CreatedAt,
                     UpdateAt = s.UpdatedAt,
-                    imagesProduct = s.ProductImages.Select(t => new ImageDoc
+                    productImageInternalDTOs = s.ProductImages.Select(t => new ImageDoc
                     {
                         Id = t.Id,
                         UrlImage = t.ImageUrl,

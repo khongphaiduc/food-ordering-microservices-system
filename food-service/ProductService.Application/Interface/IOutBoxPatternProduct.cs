@@ -7,5 +7,10 @@ namespace food_service.ProductService.Application.Interface
 
         Task CreateNewMessage(OutboxMessageDTO message);
 
+
+        Task<OutboxMessageDTO> GetMessageOutBoxMessage();
+
+
+        Task MarkAsProcessed(Guid Id);
     }
 }

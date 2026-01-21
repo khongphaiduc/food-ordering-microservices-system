@@ -1,7 +1,9 @@
 using food_service.Models;
 using food_service.ProductService.API.Middlwares;
+using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Application.Service;
 using food_service.ProductService.Domain.Interface;
+using food_service.ProductService.Infastructure.BackgroundServices;
 using food_service.ProductService.Infastructure.ImplementService;
 using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using food_service.ProductService.Infastructure.RedisService.RedisInterface;
@@ -26,8 +28,7 @@ namespace food_service.ProductService.Start
 
             builder.Services.AddDbContext<FoodProductsDbContext>(options =>
             {
-                options.UseNpgsql("Host=localhost;Port=5432;Database=food_products;Username=postgres;Password=123");
-                // options.UseNpgsql(builder.Configuration["SQLFOOD_PRODUCTS"]!);
+                options.UseNpgsql(builder.Configuration["SQLFOOD_PRODUCTS"]!);
             });
 
 
@@ -47,7 +48,9 @@ namespace food_service.ProductService.Start
             builder.Services.AddScoped<IUpdateCategory, UpdateCategory>();
             builder.Services.AddScoped<ICreateNewCategory, CreateNewCategory>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            builder.Services.AddScoped<FoodProducer>();
+            builder.Services.AddSingleton<FoodProducer>();
+
+            builder.Services.AddScoped<IOutBoxPatternProduct, OutBoxPatternProduct>();
 
 
             //redis 
@@ -59,12 +62,13 @@ namespace food_service.ProductService.Start
                 options.Configuration = builder.Configuration["RedisAddress"];
                 options.InstanceName = "FoodTrungDuc";
             });
-
+            // Redis lock
             builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
               ConnectionMultiplexer.Connect(builder.Configuration["RedisAddress"]!));
 
 
-
+            //backgroundSerivce
+            builder.Services.AddHostedService<OutboxMessageProcessor>();
             var app = builder.Build();
 
             app.UseMiddleware<CustomGlobalException>();

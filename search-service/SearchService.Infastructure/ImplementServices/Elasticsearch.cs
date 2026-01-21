@@ -31,17 +31,23 @@ namespace search_service.SearchService.Infastructure.ImplementServices
             return response.IsValidResponse;
         }
 
-        public async Task<bool> GetProduct(Guid Id)
+        public async Task<ProductDoc?> GetProductById(Guid id)
         {
-            var response = await _elasticsearchClient.GetAsync<ProductDoc>(Id.ToString(), g => g.Index("products"));
-            return response.IsValidResponse;
+            var response = await _elasticsearchClient.GetAsync<ProductDoc>(
+                id.ToString(),
+                g => g.Index("products")
+            );
+
+            if (!response.Found) return null;
+            return response.Source;
         }
+
 
         public async Task<List<ProductDoc>> SearchByKey(string key, int indexPage)
         {
             var cacheKey = $"search:{key}:page:{indexPage}";
 
-            var dataProduct = await _distributeCache.GetStringAsync(cacheKey);
+            var dataProduct = await _distributeCache.GetStringAsync(cacheKey);  // dự liệu được lưu vào trong redis là json nên cần chuyền về object 
 
             if (dataProduct != null)
             {
@@ -59,6 +65,7 @@ namespace search_service.SearchService.Infastructure.ImplementServices
                                                                      .Query(s => s.MultiMatch(t => t.Fields("name").Fields("description").Query(key))));
             var productDocument = resukt.Documents.ToList();
 
+
             var option = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(50));
             var contents = JsonSerializer.Serialize(productDocument);
 
@@ -67,5 +74,9 @@ namespace search_service.SearchService.Infastructure.ImplementServices
             return productDocument;
         }
 
+        public async Task UpdateProduct(ProductDoc product)
+        {
+            await _elasticsearchClient.IndexAsync(product, s => s.Index("products").Id(product.Id));
+        }
     }
 }

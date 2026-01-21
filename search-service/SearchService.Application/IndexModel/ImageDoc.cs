@@ -2,11 +2,11 @@
 {
     public class ImageDoc
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
-        public string UrlImage { get; set; }
+        public string? UrlImage { get; set; }
 
-        public bool IsMain { set; get; }
+        public bool? IsMain { set; get; }
 
     }
 }

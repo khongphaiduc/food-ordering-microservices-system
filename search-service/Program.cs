@@ -36,7 +36,7 @@ namespace search_service
             builder.Services.AddScoped<IGetListProduct, GetListProduct>();
             builder.Services.AddScoped<ILoadFullProduct, LoadFullProduct>();
             builder.Services.AddScoped<IElasticsearch, Elasticsearch>();
-            builder.Services.AddScoped<IElasticsearchUpdateDatabase, ElasticsearchUpdateDatabase>();
+           
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
                 ConnectionMultiplexer.Connect(builder.Configuration["HostRedis"]!));

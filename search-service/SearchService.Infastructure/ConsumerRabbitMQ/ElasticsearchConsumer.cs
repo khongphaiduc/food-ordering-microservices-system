@@ -1,6 +1,8 @@
 ﻿
+using Elastic.Clients.Elasticsearch.Snapshot;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using search_service.SearchService.Application.IndexModel;
 using search_service.SearchService.Application.Interface;
 using System.Text;
 using System.Text.Json;
@@ -49,25 +51,52 @@ namespace search_service.SearchService.Infastructure.ConsumerRabbitMQ
                 consumer.ReceivedAsync += async (model, ea) =>
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var elasticSearchUpdate =
-                        scope.ServiceProvider.GetRequiredService<IElasticsearchUpdateDatabase>();
+                    var _elasticSearchUpdate =
+                        scope.ServiceProvider.GetRequiredService<IElasticsearch>();
 
                     var message = Encoding.UTF8.GetString(ea.Body.ToArray());
 
                     try
                     {
-                        if (!Guid.TryParse(message, out var id))
+                        var content = JsonSerializer.Deserialize<ProductInternalDTO>(message);
+
+                        _logger.LogInformation($"Content tranfer from Message Broker : {content}");
+
+                        if (content == null)
                         {
-                            _logger.LogWarning("Invalid message: {Message}", message);
-
-
                             await _channel.BasicNackAsync(ea.DeliveryTag, false, false);
                             return;
                         }
 
-                        await elasticSearchUpdate.UpdateDocumentFromDatabase(id);
 
-                        await _channel.BasicAckAsync(ea.DeliveryTag, false);
+                        if (content != null)
+                        {
+                            var dataUpdate = new ProductDoc
+                            {
+                                Id = content.Id,
+                                CreateAt = DateTime.UtcNow,
+                                Description = content.Description,
+                                IdCategory = content.IdCategory,
+                                Name = content.Name,
+                                Price = content.Price,
+                                UpdateAt = DateTime.UtcNow,
+                            };
+
+
+                            if (content.productImageInternalDTOs != null)
+                            {
+                                dataUpdate.productImageInternalDTOs = content.productImageInternalDTOs.Select(t => new ImageDoc
+                                {
+                                    Id = t.Id,
+                                    IsMain = t.IsMain,
+                                    UrlImage = t.URLImage,
+                                }).ToList();
+                            }
+
+                            await _elasticSearchUpdate.UpdateProduct(dataUpdate);
+
+                            await _channel.BasicAckAsync(ea.DeliveryTag, false);
+                        }
                     }
                     catch (Exception ex)
                     {

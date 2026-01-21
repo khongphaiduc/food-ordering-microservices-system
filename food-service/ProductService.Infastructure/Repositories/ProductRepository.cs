@@ -73,6 +73,7 @@ namespace food_service.ProductService.Infastructure.Repositories
                     CreateAt = DateTime.UtcNow,
                 });
 
+
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
                 _logger.LogInformation("write new product into OutBoxTable Successful");
@@ -85,7 +86,6 @@ namespace food_service.ProductService.Infastructure.Repositories
                 _logger.LogInformation($"Error in Repository Create new Product: {s}");
                 return false;
             }
-
         }
 
         public async Task<ProductAggregate> GetProductByIdAsync(Guid productId)
