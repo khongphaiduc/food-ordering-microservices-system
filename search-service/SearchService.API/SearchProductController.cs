@@ -27,7 +27,7 @@ namespace search_service.SearchService.API
         }
 
         [HttpGet("products")]
-        public async Task<IActionResult> TestSearch([FromQuery]SearchProduct request)
+        public async Task<IActionResult> TestSearch([FromQuery] SearchProduct request)
         {
             var result = await _elasticsearch.SearchByKey(request.Key, request.Index);
 

@@ -1,11 +1,11 @@
-﻿using food_service.Models;
-//using food_service.productservice.infastructure.Models;
+﻿
 using food_service.ProductService.API.GlobalExceptions;
 using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Domain.Aggragate;
 using food_service.ProductService.Domain.Entities;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Domain.ValueOject;
+using food_service.ProductService.Infastructure.Models;
 using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -30,8 +30,8 @@ namespace food_service.ProductService.Infastructure.Repositories
 
         public async Task<bool> AddProductAsync(ProductAggregate product)
         {
+            _logger.LogInformation("Begin add new product ");
             var transaction = await _db.Database.BeginTransactionAsync();
-
             try
             {
                 var producModel = new Product
@@ -83,7 +83,7 @@ namespace food_service.ProductService.Infastructure.Repositories
             {
 
                 await transaction.RollbackAsync();
-                _logger.LogInformation($"Error in Repository Create new Product: {s}");
+                _logger.LogError($"Error in Repository Create new Product: {s}");
                 return false;
             }
         }
@@ -118,12 +118,13 @@ namespace food_service.ProductService.Infastructure.Repositories
         public async Task UpdateProductAsync(ProductAggregate product)
         {
 
-
+            _logger.LogInformation("Start update product ");
             var productBase = await _db.Products.Include(s => s.ProductVariants).Include(s => s.ProductImages).FirstOrDefaultAsync(p => p.Id == product.Id);
 
 
             if (productBase == null)
             {
+                _logger.LogError($"Can not  find product with Id {product.Id}");
                 throw new ProductNotFoundException($"ProductDTO with id {product.Id} not found");
             }
             else
@@ -182,7 +183,15 @@ namespace food_service.ProductService.Infastructure.Repositories
                     }
                 }
 
-                await _db.SaveChangesAsync();
+                var result = await _db.SaveChangesAsync() > 0;
+                if (result)
+                {
+                    _logger.LogInformation($"update product id  {product.Id} Successful");
+                }
+                else
+                {
+                    _logger.LogInformation($"update product id  {product.Id} fail");
+                }
             }
 
         }

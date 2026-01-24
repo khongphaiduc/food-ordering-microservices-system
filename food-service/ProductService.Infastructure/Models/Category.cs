@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace food_service.Models;
+namespace food_service.ProductService.Infastructure.Models;
 
-public partial class ProductVariant
+public partial class Category
 {
     public Guid Id { get; set; }
 
-    public Guid ProductId { get; set; }
-
     public string Name { get; set; } = null!;
 
-    public decimal ExtraPrice { get; set; }
+    public string? Description { get; set; }
 
     public bool IsActive { get; set; }
 
@@ -19,5 +17,5 @@ public partial class ProductVariant
 
     public DateTime UpdatedAt { get; set; }
 
-    public virtual Product Product { get; set; } = null!;
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace food_service.Models;
+namespace food_service.ProductService.Infastructure.Models;
 
 public partial class ProductImage
 {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace food_service.Models
+namespace food_service.ProductService.Infastructure.Models
 {
     [Table("OutBoxMessage")]
     public class OutBoxMessage

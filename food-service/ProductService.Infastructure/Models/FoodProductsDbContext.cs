@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace food_service.Models;
+namespace food_service.ProductService.Infastructure.Models;
 
 public partial class FoodProductsDbContext : DbContext
 {

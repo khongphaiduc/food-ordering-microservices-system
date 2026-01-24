@@ -1,16 +1,17 @@
-using food_service.Models;
 using food_service.ProductService.API.Middlwares;
 using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Application.Service;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Infastructure.BackgroundServices;
 using food_service.ProductService.Infastructure.ImplementService;
+using food_service.ProductService.Infastructure.Models;
 using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using food_service.ProductService.Infastructure.RedisService.RedisInterface;
 using food_service.ProductService.Infastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using StackExchange.Redis;
 
 namespace food_service.ProductService.Start
@@ -24,7 +25,14 @@ namespace food_service.ProductService.Start
 
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            //serilog 
+            builder.Host.UseSerilog((context, services, configuration) =>
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.FromLogContext();
+            });
 
             builder.Services.AddDbContext<FoodProductsDbContext>(options =>
             {

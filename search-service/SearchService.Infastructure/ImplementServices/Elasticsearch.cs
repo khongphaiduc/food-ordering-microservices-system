@@ -11,11 +11,13 @@ namespace search_service.SearchService.Infastructure.ImplementServices
     {
         private readonly ElasticsearchClient _elasticsearchClient;
         private readonly IDistributedCache _distributeCache;
+        private readonly ILogger<Elasticsearch> _logger;
 
-        public Elasticsearch(ElasticsearchClient elasticsearchClient, IDistributedCache distributedCache)
+        public Elasticsearch(ElasticsearchClient elasticsearchClient, IDistributedCache distributedCache, ILogger<Elasticsearch> logger)
         {
             _elasticsearchClient = elasticsearchClient;
             _distributeCache = distributedCache;
+            _logger = logger;
         }
 
         public async Task<bool> AddNewProduct(ProductDoc product)
@@ -59,12 +61,20 @@ namespace search_service.SearchService.Infastructure.ImplementServices
             var size = 10;
             var number = (indexPage - 1) * 10;
 
-            var resukt = await _elasticsearchClient.SearchAsync<ProductDoc>(s => s.Index("products")
-                                                                     .From(number)
-                                                                     .Size(size)
-                                                                     .Query(s => s.MultiMatch(t => t.Fields("name").Fields("description").Query(key))));
-            var productDocument = resukt.Documents.ToList();
+            var result = await _elasticsearchClient.SearchAsync<ProductDoc>(s => s.Index("products").From(number).Size(size)
+               .Query(q => q
+               .QueryString(qs => qs
+                  .Query(key)
+                ))
+            );
 
+
+            var productDocument = result.Documents.ToList();
+
+            if (productDocument == null)
+            {
+                _logger.LogError("Not data from elasticsearch");
+            }
 
             var option = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(50));
             var contents = JsonSerializer.Serialize(productDocument);

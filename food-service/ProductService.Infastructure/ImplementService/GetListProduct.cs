@@ -1,7 +1,7 @@
-﻿using food_service.Models;
-using food_service.ProductService.Application.DTOs.Request;
+﻿using food_service.ProductService.Application.DTOs.Request;
 using food_service.ProductService.Application.DTOs.Response;
 using food_service.ProductService.Application.Service;
+using food_service.ProductService.Infastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Net.WebSockets;

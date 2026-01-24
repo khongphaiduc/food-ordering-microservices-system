@@ -4,8 +4,6 @@ namespace food_service.ProductService.Domain.Aggragate
 {
     public class CategoryAggregate
     {
-
-
         public Guid Id { get; private set; }
 
         public Name Name { get; private set; }
@@ -27,6 +25,7 @@ namespace food_service.ProductService.Domain.Aggragate
             CreateAt = createAt;
             UpdateAt = updateAt;
         }
+
         private CategoryAggregate()
         {
         }

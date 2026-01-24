@@ -1,4 +1,5 @@
 ﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 using Microsoft.EntityFrameworkCore;
 using search_service.Models;
 using search_service.SearchService.API.Middlware;
@@ -30,23 +31,25 @@ namespace search_service
                 options.Configuration = builder.Configuration["HostRedis"];
                 options.InstanceName = "ListProduct";
             });
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+                          ConnectionMultiplexer.Connect(builder.Configuration["HostRedis"]!));
+
 
 
             builder.Services.AddScoped<IRedisLockService, RedisLockService>();
             builder.Services.AddScoped<IGetListProduct, GetListProduct>();
             builder.Services.AddScoped<ILoadFullProduct, LoadFullProduct>();
             builder.Services.AddScoped<IElasticsearch, Elasticsearch>();
-           
 
-            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-                ConnectionMultiplexer.Connect(builder.Configuration["HostRedis"]!));
 
 
             builder.Services.AddHostedService<ElasticsearchConsumer>();
 
             // elasticsearch
-            var settings = new ElasticsearchClientSettings(new Uri("http://localhost:9200")).DefaultIndex("products"); // nếu lúc truy vấn mà không khai báo index thì mặc định sẽ sử dụng Index : products
-
+            var settings = new ElasticsearchClientSettings(new Uri("https://localhost:9200"))
+                 .DefaultIndex("products")
+                 .Authentication(new BasicAuthentication("elastic", "tRKT9*XFLHZog*Wzmd2v"))
+                 .ServerCertificateValidationCallback((sender, cert, chain, errors) => true);
             var client = new ElasticsearchClient(settings);  // là object trung tâm để [Search , index , update, delete]
 
             builder.Services.AddSingleton(client);

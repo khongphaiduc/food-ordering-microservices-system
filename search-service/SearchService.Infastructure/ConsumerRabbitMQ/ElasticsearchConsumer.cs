@@ -32,6 +32,7 @@ namespace search_service.SearchService.Infastructure.ConsumerRabbitMQ
                     HostName = _iconfig["RabbitMQ_Side_SearchService:Host"]!,
                     UserName = _iconfig["RabbitMQ_Side_SearchService:Username"]!,
                     Password = _iconfig["RabbitMQ_Side_SearchService:Password"]!,
+                    Port = int.Parse(_iconfig["RabbitMQ_Side_SearchService:Port"]!),
                 };
 
                 _connection = await factory.CreateConnectionAsync();

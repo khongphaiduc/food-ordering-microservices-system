@@ -1,6 +1,7 @@
-﻿using food_service.Models;
+﻿
 using food_service.ProductService.Application.DTOs.Internals;
 using food_service.ProductService.Application.Interface;
+using food_service.ProductService.Infastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Net.WebSockets;
 using System.Text.Json;

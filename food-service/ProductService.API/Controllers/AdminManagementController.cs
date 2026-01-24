@@ -13,12 +13,14 @@ namespace food_service.ProductService.API.Controllers
         private readonly ICreateNewCategory _iAddNewCategory;
         private readonly ICreateNewProduct _iAddNewProduct;
         private readonly IUpdateCategory _iUpdateCategory;
+        private readonly ILogger<AdminManagementController> _logger;
 
-        public AdminManagementController(ICreateNewProduct createNewProduct, ICreateNewCategory createNewCategory, IUpdateCategory updateCategory)
+        public AdminManagementController(ICreateNewProduct createNewProduct, ICreateNewCategory createNewCategory, IUpdateCategory updateCategory, ILogger<AdminManagementController> logger)
         {
             _iAddNewCategory = createNewCategory;
             _iAddNewProduct = createNewProduct;
             _iUpdateCategory = updateCategory;
+            _logger = logger;
         }
 
 

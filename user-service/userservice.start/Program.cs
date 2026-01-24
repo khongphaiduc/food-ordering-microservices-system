@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using user_service.userservice.infastructure.DBcontextService;
 using user_service.UserService.API.gRPC;
 using user_service.UserService.Application.Services;
@@ -53,6 +55,21 @@ namespace user_service.userservice.start
             builder.Services.AddGrpc();// 1. Add gRPC
 
 
+            //builder.Services.AddOpenTelemetry()
+            //    .WithTracing(tracing =>
+            //    {
+            //        tracing.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("UserInfoService"))
+            //               .AddAspNetCoreInstrumentation()
+            //               .AddHttpClientInstrumentation()
+            //               .AddEntityFrameworkCoreInstrumentation()
+            //               .AddConsoleExporter()
+            //               .AddOtlpExporter(opt =>
+            //                 {
+            //                     opt.Endpoint = new Uri("http://localhost:4318");
+            //                     opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+            //                 });
+            //    });
+
 
             var app = builder.Build();
 
@@ -62,8 +79,8 @@ namespace user_service.userservice.start
             app.MapGet("/", () => "gRPC Server running");// endpoint
 
             app.UseRouting();
-            
-            app.UseHttpsRedirection();
+
+            //app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
 

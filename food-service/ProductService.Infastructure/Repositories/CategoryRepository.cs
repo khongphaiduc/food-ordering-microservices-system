@@ -1,8 +1,8 @@
-﻿using food_service.Models;
-using food_service.ProductService.API.GlobalExceptions;
+﻿using food_service.ProductService.API.GlobalExceptions;
 using food_service.ProductService.Domain.Aggragate;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Domain.ValueOject;
+using food_service.ProductService.Infastructure.Models;
 using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using Microsoft.EntityFrameworkCore;
 
