@@ -22,6 +22,9 @@ public partial class FoodAuthContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+
+    public virtual DbSet<OutBoxMessageTable> OutBoxMessageTables { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
 

@@ -5,9 +5,11 @@ using auth_services.AuthService.Application.Service;
 using auth_services.AuthService.Domain.Aggregate;
 using auth_services.AuthService.Domain.Interface;
 using auth_services.AuthService.Domain.ValueObject;
+using auth_services.AuthService.Infastructure.DbContextAuth;
 using auth_services.AuthService.Infastructure.IntegrationContracts;
 using auth_services.AuthService.Infastructure.RabbitMQs.Producer;
 using Grpc.Core;
+using System.Text.Json;
 using UserService.API.Protos;
 
 namespace auth_services.AuthService.Infastructure.ServiceImpelemt
@@ -20,8 +22,11 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
         private readonly RabbitMQProducer _rabbitMQ;
         private readonly IConfiguration _iConfig;
         private readonly UserServicesClient _userClient;
+        private readonly FoodAuthContext _db;
+        private readonly IOutBoxMessage _outBox;
+        private readonly ILogger<SignUpUser> _logger;
 
-        public SignUpUser(IGenarateSalt genarateSalt, IHashPassword hashPassword, IUserRepository userRepository, RabbitMQProducer rabbitMQProducer, IConfiguration configuration, UserServicesClient userServicesClient)
+        public SignUpUser(ILogger<SignUpUser> logger, IGenarateSalt genarateSalt, IHashPassword hashPassword, IUserRepository userRepository, RabbitMQProducer rabbitMQProducer, IConfiguration configuration, UserServicesClient userServicesClient, FoodAuthContext context, IOutBoxMessage outBoxMessage)
         {
             _iGenarateSalt = genarateSalt;
             _iHashPassword = hashPassword;
@@ -29,6 +34,9 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
             _rabbitMQ = rabbitMQProducer;
             _iConfig = configuration;
             _userClient = userServicesClient;
+            _db = context;
+            _outBox = outBoxMessage;
+            _logger = logger;
         }
 
         public async Task<bool> Execute(RequestCreateNewUser user)
@@ -42,12 +50,9 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
             // aggregate root
             var userAggregate = UserAggregate.CreateNewUser(new FullNameOfUser(user.UserName), new Email(user.Email), hashedPassword, salt);
 
-            var result = await _iUserRepository.AddNewUser(userAggregate);
-
-
             // call gRPC user Client
             for (int i = 0; i < 3; i++)
-            {        //retry
+            {
 
                 try
                 {
@@ -75,22 +80,33 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
                 }
 
             }
-
-            if (result)
+            var transaction = await _db.Database.BeginTransactionAsync();
+            try
             {
-                // send message into  rabbbitMQ 
-                await _rabbitMQ.SendMessage(new RegisterNotificationMessage
+
+                await _iUserRepository.AddNewUser(userAggregate);
+
+                var payload = JsonSerializer.Serialize(new RegisterNotificationMessage
                 {
                     Email = userAggregate.Email.EmailAdress,
                     Name = userAggregate.Email.EmailAdress,
                     TypeService = "Email"
-                }, _iConfig["RabbitMQ_Side_Auth:Queue:Notification_Email:RoutingKey"]!);
+                });
+
+                await _outBox.CreateNewMessage(new OutBoxMessageInternalDTO("Notification", payload));
+                await _db.SaveChangesAsync();
+
+
+                await transaction.CommitAsync();
                 return true;
             }
-            else
+            catch (Exception ex)
             {
+                _logger.LogError($"Bug At SigUp New User :{ex.Message}");
+                await transaction.RollbackAsync();
                 return false;
             }
+
         }
     }
 }

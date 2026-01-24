@@ -20,7 +20,7 @@ namespace auth_services.AuthService.Infastructure.Reposistory
         }
 
         // thêm user 
-        public async Task<bool> AddNewUser(UserAggregate userAggregate)
+        public async Task AddNewUser(UserAggregate userAggregate)
         {
             var role = await _db.Roles.FirstOrDefaultAsync(s => s.Name == "Customer") ?? throw new NotfoundExceptions("Not found role User");
 
@@ -40,7 +40,7 @@ namespace auth_services.AuthService.Infastructure.Reposistory
             users.Roles.Add(role);
 
             await _db.Users.AddAsync(users);
-            return await _db.SaveChangesAsync() > 0;
+
         }
 
         // lấy user rồi map sang  Aggregate
