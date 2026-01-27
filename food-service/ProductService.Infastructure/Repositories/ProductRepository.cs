@@ -1,4 +1,5 @@
 ﻿
+using CommunityToolkit.HighPerformance.Helpers;
 using food_service.ProductService.API.GlobalExceptions;
 using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Domain.Aggragate;
@@ -45,6 +46,25 @@ namespace food_service.ProductService.Infastructure.Repositories
                     IsDeleted = product.IsDeleted,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.UpdatedAt,
+                    ProductImages = product.ProductImagesEntities.Select(s => new ProductImage
+                    {
+                        Id = s.Id,
+                        ProductId = s.ProductId,
+                        ImageUrl = s.ImageUrl,
+                        IsMain = s.IsMain,
+                    }).ToList(),
+
+                    ProductVariants = product.ProductVariantEntities.Select(q => new ProductVariant
+                    {
+                        Id = q.Id,
+                        ProductId = q.ProductId,
+                        Name = q.VariantName.Value,
+                        CreatedAt = q.CreateAt,
+                        ExtraPrice = q.ExtraPrice.Value,
+                        IsActive = q.IsActive,
+                        UpdatedAt = q.UpdateAt
+                        
+                    }).ToList()
                 };
 
 
@@ -57,6 +77,24 @@ namespace food_service.ProductService.Infastructure.Repositories
                     Price = producModel.Price,
                     UpdateAt = producModel.UpdatedAt,
                     CreateAt = producModel.CreatedAt,
+
+                    productImageInternalDTOs = product.ProductImagesEntities.Select(s => new ProductImageInternalDTO
+                    {
+                        Id = s.Id,
+                        IsMain = s.IsMain,
+                        URLImage = s.ImageUrl,
+                    }).ToList(),
+
+
+                    productVarientInternalDTOs = product.ProductVariantEntities.Select(f => new ProductVarientInternalDTO
+                    {
+                        CreateAt = f.CreateAt,
+                        Extra_Price = f.ExtraPrice.Value,
+                        Name = f.VariantName.Value,
+                        IdProduct = f.ProductId,
+                        UpdateAt = f.UpdateAt,
+                         
+                    }).ToList(),
                 };
 
                 // ghi vào base 

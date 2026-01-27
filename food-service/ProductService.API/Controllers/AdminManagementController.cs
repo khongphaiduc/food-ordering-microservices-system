@@ -26,7 +26,7 @@ namespace food_service.ProductService.API.Controllers
 
         // đã test
         [HttpPost("products")]
-        public async Task<ActionResult> CreateNewProduct([FromBody] CreateNewProducDTO request)
+        public async Task<ActionResult> CreateNewProduct([FromForm] CreateNewProducDTO request)
         {
             var result = await _iAddNewProduct.ExcuteAsync(request);
             if (result)

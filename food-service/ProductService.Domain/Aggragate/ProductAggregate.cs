@@ -49,7 +49,7 @@ namespace food_service.ProductService.Domain.Aggragate
             this.productVariantEntities = productVariantEntities;
         }
 
-        public static ProductAggregate CreateNewProduct(Guid idCategory,Name name, Price price, string description)
+        public static ProductAggregate CreateNewProduct(Guid idCategory, Name name, Price price, string description)
         {
             return new ProductAggregate
             {
@@ -63,6 +63,16 @@ namespace food_service.ProductService.Domain.Aggragate
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
+        }
+
+        public void AddNewImage(ProductImagesEntity image)
+        {
+            productImagesEntities.Add(image);
+        }
+
+        public void AddNewVariant(ProductVariantEntity variant)
+        {
+            productVariantEntities.Add(variant);
         }
 
         public void ChangePrice(Price price)

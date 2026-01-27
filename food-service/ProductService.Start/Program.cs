@@ -4,6 +4,7 @@ using food_service.ProductService.Application.Service;
 using food_service.ProductService.Domain.Interface;
 using food_service.ProductService.Infastructure.BackgroundServices;
 using food_service.ProductService.Infastructure.ImplementService;
+using food_service.ProductService.Infastructure.MinIO;
 using food_service.ProductService.Infastructure.Models;
 using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using food_service.ProductService.Infastructure.RedisService.RedisInterface;
@@ -70,6 +71,9 @@ namespace food_service.ProductService.Start
 
             builder.Services.AddScoped<IOutBoxPatternProduct, OutBoxPatternProduct>();
 
+            builder.Services.AddScoped<IMinIOFood,MinIOFood>();
+
+          //  builder.Services.Add
 
             //redis 
 
@@ -92,7 +96,7 @@ namespace food_service.ProductService.Start
             builder.Services.AddSingleton<IMinioClient>(sp =>
             {
                 return new MinioClient()
-                    .WithEndpoint(builder.Configuration["Minio:localhost:9000"])
+                    .WithEndpoint("localhost:9000")
                     .WithCredentials(builder.Configuration["Minio:AccessKey"], builder.Configuration["Minio:SecretKey"])
                     .WithSSL(false)
                     .Build();
@@ -101,7 +105,7 @@ namespace food_service.ProductService.Start
 
 
             //backgroundSerivce
-            builder.Services.AddHostedService<OutboxMessageProcessor>();
+            //builder.Services.AddHostedService<OutboxMessageProcessor>();
 
             builder.Services.AddControllers();
 

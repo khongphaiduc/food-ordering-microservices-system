@@ -32,7 +32,7 @@ namespace food_service.ProductService.Infastructure.BackgroundServices
 
                     var Outbox = await outBoxMessageTable.GetMessageOutBoxMessage();
 
-                    _logger.LogInformation("Message cần handle is :" + Outbox.Type);
+                    //_logger.LogInformation("Message cần handle is :" + Outbox.Type);
 
                     if (Outbox == null)
                     {

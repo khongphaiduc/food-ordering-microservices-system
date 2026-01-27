@@ -27,17 +27,15 @@ namespace food_service.ProductService.Infastructure.MinIO
 
         public async Task<string> UploadAsync(IFormFile file)
         {
-            var objectName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var objectName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";   //GetExtention lấy đuôi file
 
             using var stream = file.OpenReadStream();
 
-            var found = await _clientMinIO.BucketExistsAsync(
-                new BucketExistsArgs().WithBucket(_configuration["Minio:Bucket"]));
+            var found = await _clientMinIO.BucketExistsAsync(new BucketExistsArgs().WithBucket(_configuration["Minio:Bucket"]));
 
             if (!found)
             {
-                await _clientMinIO.MakeBucketAsync(
-                    new MakeBucketArgs().WithBucket(_configuration["Minio:Bucket"]));
+                await _clientMinIO.MakeBucketAsync(new MakeBucketArgs().WithBucket(_configuration["Minio:Bucket"]));
             }
 
             await _clientMinIO.PutObjectAsync(
@@ -48,9 +46,7 @@ namespace food_service.ProductService.Infastructure.MinIO
                     .WithObjectSize(stream.Length)
                     .WithContentType(file.ContentType)
             );
-
             return objectName;
-
         }
     }
 }

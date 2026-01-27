@@ -17,6 +17,7 @@
 
         public List<ProductImageInternalDTO> productImageInternalDTOs { get; set; }
 
+        public List<ProductVarientInternalDTO> productVarientInternalDTOs { get; set; }
 
     }
 }
