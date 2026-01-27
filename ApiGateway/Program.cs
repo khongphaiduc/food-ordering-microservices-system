@@ -9,7 +9,7 @@ namespace ApiGateway
         {
             var builder = WebApplication.CreateBuilder(args);
 
-   
+
             builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 
             builder.Services.AddCors(options =>
@@ -17,7 +17,7 @@ namespace ApiGateway
                 options.AddPolicy("AllowReact",
                     policy =>
                         policy
-                            .WithOrigins("http://localhost:5173")
+                            .WithOrigins("http://localhost:5174")
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                 );

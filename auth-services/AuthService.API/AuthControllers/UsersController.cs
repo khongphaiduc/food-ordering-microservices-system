@@ -5,13 +5,14 @@ using auth_services.AuthService.Infastructure.DbContextAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using UserService.API.Protos;
 
 namespace auth_services.AuthService.API.AuthControllers
 {
-
+    [EnableRateLimiting("fixed")]
     [Route("api/auth")]
     [ApiController]
     public class UsersController : ControllerBase

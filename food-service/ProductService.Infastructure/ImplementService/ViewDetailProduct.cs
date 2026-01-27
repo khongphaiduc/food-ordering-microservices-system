@@ -19,7 +19,7 @@ namespace food_service.ProductService.Infastructure.ImplementService
         public async Task<ProductDetailDTO> ExcuteAsync(Guid idProduct)
         {
 
-            var product = await _db.Products.Where(s => s.Id == idProduct).Select(s => new ProductDetailDTO
+            var product = await _db.Products.AsSplitQuery().Where(s => s.Id == idProduct).Select(s => new ProductDetailDTO
             {
 
                 IdProduct = s.Id,

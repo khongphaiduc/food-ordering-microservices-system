@@ -10,7 +10,10 @@ using food_service.ProductService.Infastructure.RedisService.RedisInterface;
 using food_service.ProductService.Infastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Minio;
 using Serilog;
 using StackExchange.Redis;
 
@@ -25,7 +28,7 @@ namespace food_service.ProductService.Start
 
             var builder = WebApplication.CreateBuilder(args);
 
-            //serilog 
+            ////serilog 
             builder.Host.UseSerilog((context, services, configuration) =>
             {
                 configuration
@@ -39,15 +42,22 @@ namespace food_service.ProductService.Start
                 options.UseNpgsql(builder.Configuration["SQLFOOD_PRODUCTS"]!);
             });
 
-
-            builder.Services.AddControllers();
-
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 
             });
 
+
+            builder.Services.AddRateLimiter(option =>
+            {
+                option.AddFixedWindowLimiter("rateFix", s =>
+                {
+                    s.Window = TimeSpan.FromSeconds(60);
+                    s.PermitLimit = 1;
+                    s.QueueLimit = 0;
+                });
+            });
 
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IGetListProduct, GetListProduct>();
@@ -75,9 +85,29 @@ namespace food_service.ProductService.Start
               ConnectionMultiplexer.Connect(builder.Configuration["RedisAddress"]!));
 
 
+
+
+            //MinIO 
+
+            builder.Services.AddSingleton<IMinioClient>(sp =>
+            {
+                return new MinioClient()
+                    .WithEndpoint(builder.Configuration["Minio:localhost:9000"])
+                    .WithCredentials(builder.Configuration["Minio:AccessKey"], builder.Configuration["Minio:SecretKey"])
+                    .WithSSL(false)
+                    .Build();
+            });
+
+
+
             //backgroundSerivce
             builder.Services.AddHostedService<OutboxMessageProcessor>();
+
+            builder.Services.AddControllers();
+
             var app = builder.Build();
+
+            app.UseRateLimiter();
 
             app.UseMiddleware<CustomGlobalException>();
 

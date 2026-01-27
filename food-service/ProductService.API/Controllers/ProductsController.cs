@@ -2,10 +2,12 @@
 using food_service.ProductService.Application.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.Tasks;
 
 namespace food_service.ProductService.API.Controllers
 {
+    //[EnableRateLimiting("rateFix")]
     [Route("api/products")]
     [ApiController]
     public class ProductsController : ControllerBase

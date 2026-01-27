@@ -11,8 +11,10 @@ using auth_services.AuthService.Infastructure.Security;
 using auth_services.AuthService.Infastructure.ServiceImpelemt;
 using auth_services.AuthService.Infastructure.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Threading.RateLimiting;
 using UserService.API.Protos;
 
 namespace auth_services.AuthService.Start
@@ -60,6 +62,17 @@ namespace auth_services.AuthService.Start
             });
 
 
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter("fixed", opt =>
+                {
+                    opt.Window = TimeSpan.FromSeconds(30);
+                    opt.PermitLimit = 100;     // 100 request
+                    opt.QueueLimit = 0;        // không cho chờ
+                });
+            });
+
+
             // gRPC
             builder.Services.AddGrpcClient<UserInfoGrpc.UserInfoGrpcClient>(s =>
             {
@@ -94,6 +107,7 @@ namespace auth_services.AuthService.Start
 
             var app = builder.Build();
 
+            app.UseRateLimiter();
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
