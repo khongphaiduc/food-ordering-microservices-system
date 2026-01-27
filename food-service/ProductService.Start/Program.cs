@@ -68,6 +68,7 @@ namespace food_service.ProductService.Start
             builder.Services.AddScoped<ICreateNewCategory, CreateNewCategory>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddSingleton<FoodProducer>();
+            builder.Services.AddScoped<IUpdateProduct, UpdateProduct>();
 
             builder.Services.AddScoped<IOutBoxPatternProduct, OutBoxPatternProduct>();
 

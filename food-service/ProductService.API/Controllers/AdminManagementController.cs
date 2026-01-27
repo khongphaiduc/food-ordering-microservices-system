@@ -70,6 +70,13 @@ namespace food_service.ProductService.API.Controllers
             }
         }
 
+        [HttpPut("products")]
+        public async Task<IActionResult> UpdateProduct(Guid IdProduct)
+        {
+
+            return Ok();
+        }
+
 
     }
 }
