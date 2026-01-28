@@ -14,13 +14,15 @@ namespace food_service.ProductService.API.Controllers
         private readonly ICreateNewProduct _iAddNewProduct;
         private readonly IUpdateCategory _iUpdateCategory;
         private readonly ILogger<AdminManagementController> _logger;
+        private readonly IUpdateProduct _updateProduct;
 
-        public AdminManagementController(ICreateNewProduct createNewProduct, ICreateNewCategory createNewCategory, IUpdateCategory updateCategory, ILogger<AdminManagementController> logger)
+        public AdminManagementController(IUpdateProduct updateProduct, ICreateNewProduct createNewProduct, ICreateNewCategory createNewCategory, IUpdateCategory updateCategory, ILogger<AdminManagementController> logger)
         {
             _iAddNewCategory = createNewCategory;
             _iAddNewProduct = createNewProduct;
             _iUpdateCategory = updateCategory;
             _logger = logger;
+            _updateProduct = updateProduct;
         }
 
 
@@ -71,9 +73,9 @@ namespace food_service.ProductService.API.Controllers
         }
 
         [HttpPut("products")]
-        public async Task<IActionResult> UpdateProduct(Guid IdProduct)
+        public async Task<IActionResult> UpdateProduct([FromForm] UpdateProductDTO updateProduct)
         {
-
+            await _updateProduct.Excute(updateProduct);
             return Ok();
         }
 

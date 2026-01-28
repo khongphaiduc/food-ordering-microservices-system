@@ -49,6 +49,7 @@ namespace food_service.ProductService.Domain.Aggragate
             this.productVariantEntities = productVariantEntities;
         }
 
+
         public static ProductAggregate CreateNewProduct(Guid idCategory, Name name, Price price, string description)
         {
             return new ProductAggregate
@@ -99,5 +100,13 @@ namespace food_service.ProductService.Domain.Aggragate
             IsAvailable = isAvailable;
             UpdatedAt = DateTime.UtcNow;
         }
+
+
+        public void IsDeleting(bool IsChange)
+        {
+            IsDeleted = IsChange;
+
+        }
+
     }
 }
