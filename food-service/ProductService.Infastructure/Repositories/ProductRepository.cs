@@ -63,7 +63,7 @@ namespace food_service.ProductService.Infastructure.Repositories
                         ExtraPrice = q.ExtraPrice.Value,
                         IsActive = q.IsActive,
                         UpdatedAt = q.UpdateAt
-                        
+
                     }).ToList()
                 };
 
@@ -93,7 +93,7 @@ namespace food_service.ProductService.Infastructure.Repositories
                         Name = f.VariantName.Value,
                         IdProduct = f.ProductId,
                         UpdateAt = f.UpdateAt,
-                         
+
                     }).ToList(),
                 };
 
@@ -171,15 +171,17 @@ namespace food_service.ProductService.Infastructure.Repositories
                 productBase.Description = product.Description;
                 productBase.Price = product.PriceProduct.Value;
                 productBase.IsAvailable = product.IsAvailable;
-                productBase.UpdatedAt = DateTime.UtcNow;
+                productBase.UpdatedAt = product.UpdatedAt;
                 productBase.IsDeleted = product.IsDeleted;
+
+
 
 
                 foreach (var image in product.ProductImagesEntities)
                 {
-                    if (!productBase.ProductImages.Any(s => s.Id == image.Id))
+                    if (!productBase.ProductImages.Any(s => s.Id == image.Id))   // db không có , request có  => thêm 
                     {
-                        productBase.ProductImages.Add(new ProductImage()
+                        _db.ProductImages.Add(new ProductImage()
                         {
                             Id = image.Id,
                             ProductId = image.ProductId,
@@ -187,39 +189,27 @@ namespace food_service.ProductService.Infastructure.Repositories
                             IsMain = image.IsMain
                         });
                     }
-                    else
+                    else                                                        // db có , requets có => update 
                     {
-                        var imageToUpdate = productBase.ProductImages.First(s => s.Id == image.Id);
-                        imageToUpdate.ImageUrl = image.ImageUrl;
-                        imageToUpdate.IsMain = image.IsMain;
-                    }
-                }
+                        var imageItem = productBase.ProductImages.FirstOrDefault(s => s.Id == image.Id);
 
-
-                foreach (var variant in product.ProductVariantEntities)
-                {
-                    if (!productBase.ProductVariants.Any(s => s.Id == variant.Id))
-                    {
-                        productBase.ProductVariants.Add(new ProductVariant()
+                        if (imageItem != null)
                         {
-                            Id = variant.Id,
-                            ProductId = variant.ProductId,
-                            Name = variant.VariantName.Value,
-                            ExtraPrice = variant.ExtraPrice.Value,
-                            IsActive = variant.IsActive,
-                            CreatedAt = variant.CreateAt,
-                            UpdatedAt = variant.UpdateAt
-                        });
+                            imageItem.ImageUrl = image.ImageUrl;
+                            imageItem.IsMain = image.IsMain;
+                        }
+
                     }
-                    else
-                    {
-                        var variantToUpdate = productBase.ProductVariants.First(s => s.Id == variant.Id);
-                        variantToUpdate.Name = variant.VariantName.Value;
-                        variantToUpdate.ExtraPrice = variant.ExtraPrice.Value;
-                        variantToUpdate.IsActive = variant.IsActive;
-                        variantToUpdate.UpdatedAt = DateTime.UtcNow;
-                    }
+
                 }
+
+                // Db có , reuqest không có  => xóa
+                //  var ImageProductId = product.ProductImagesEntities.Select(s => s.Id).ToList();
+                //var listImageRemove = productBase.ProductImages.Where(s => !ImageProductId.Any(t => s.Id == t)).ToList();
+                //_db.RemoveRange(listImageRemove);
+
+
+
 
                 var result = await _db.SaveChangesAsync() > 0;
                 if (result)
@@ -230,6 +220,7 @@ namespace food_service.ProductService.Infastructure.Repositories
                 {
                     _logger.LogInformation($"update product id  {product.Id} fail");
                 }
+
             }
 
         }

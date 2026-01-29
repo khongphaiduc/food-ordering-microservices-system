@@ -36,8 +36,8 @@ namespace food_service.ProductService.Domain.Aggragate
 
         internal ProductAggregate(Guid id, Guid productID, Name nameProduct, Price priceProduct, string description, bool isAvailable, bool isDeleted, DateTime createdAt, DateTime updatedAt, List<ProductImagesEntity> productImagesEntities, List<ProductVariantEntity> productVariantEntities)
         {
-            Id = id;
-            CategoryId = productID;
+            Id = productID;
+            CategoryId = id;
             NameProduct = nameProduct;
             PriceProduct = priceProduct;
             Description = description;
@@ -106,6 +106,12 @@ namespace food_service.ProductService.Domain.Aggragate
         {
             IsDeleted = IsChange;
 
+        }
+
+
+        public void DeleteImage(ProductImagesEntity image)
+        {
+            productImagesEntities.Remove(image);
         }
 
     }

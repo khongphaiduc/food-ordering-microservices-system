@@ -17,12 +17,14 @@ namespace food_service.ProductService.Infastructure.ImplementService
         private readonly IProductRepository _product;
         private readonly FoodProductsDbContext _db;
         private readonly IMinIOFood _minIO;
+        private readonly ILogger<UpdateProduct> _logger;
 
-        public UpdateProduct(IProductRepository productRepository, FoodProductsDbContext db, IMinIOFood minIOFood)
+        public UpdateProduct(IProductRepository productRepository, FoodProductsDbContext db, IMinIOFood minIOFood, ILogger<UpdateProduct> logger)
         {
             _product = productRepository;
             _db = db;
             _minIO = minIOFood;
+            _logger = logger;
         }
 
 
@@ -30,9 +32,18 @@ namespace food_service.ProductService.Infastructure.ImplementService
         public async Task Excute(UpdateProductDTO productRequest)
         {
 
-            var product = await _db.Products.Include(s => s.ProductVariants).Include(s => s.ProductImages).Where(s => s.Id == productRequest.IdProduct).FirstOrDefaultAsync();
+            var product = await _db.Products.Include(s=>s.ProductVariants).Include(s=>s.ProductImages).Where(s => s.Id == productRequest.IdProduct).FirstOrDefaultAsync();
 
-            if (product == null) { return; }
+
+
+            if (product == null)
+            {
+                _logger.LogError($"Product dfnasdfasbfdkjasbfdasdf with ID : {productRequest.IdProduct} is not found");
+                return;
+            }
+
+
+            _logger.LogInformation($"Product tồn tại với id {product.Id}");
 
             var listImage = product.ProductImages.Select(s => new ProductImagesEntity(s.Id, s.ProductId, s.ImageUrl, s.IsMain)).ToList();
 
@@ -56,24 +67,26 @@ namespace food_service.ProductService.Infastructure.ImplementService
             {
                 foreach (var image in productRequest.AddnewImagesProducts)
                 {
-                    var nameImage = await _minIO.UploadAsync(image.images);
+                     var  nameImage = await _minIO.UploadAsync(image.images);
                     productAggregate.AddNewImage(ProductImagesEntity.CreateNewImage(productAggregate.Id, nameImage, image.IsMain));
                 }
             }
 
 
-            // delete imgae 
             if (productRequest.DeleteImage != null && productRequest.DeleteImage.Any())
             {
-                foreach (var image in productAggregate.ProductImagesEntities)
+                foreach (var imageId in productRequest.DeleteImage)
                 {
-                    var imageName = image.ImageUrl;
-                    await _minIO.DeleteAsync(imageName);
+                    var image = productAggregate.ProductImagesEntities
+                        .FirstOrDefault(x => x.Id == imageId);
+
+                    if (image != null)
+                    {
+                        await _minIO.DeleteAsync(image.ImageUrl);
+                      
+                    }
                 }
             }
-
-
-
             await _product.UpdateProductAsync(productAggregate);
         }
 
