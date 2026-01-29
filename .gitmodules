@@ -1,0 +1,3 @@
+[submodule "food-ordering-microservices-frontend"]
+	path = food-ordering-microservices-frontend
+	url = https://github.com/khongphaiduc/food-ordering-microservices-frontend.git
