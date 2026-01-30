@@ -191,7 +191,7 @@ namespace food_service.ProductService.Infastructure.Repositories
                     }
                     else                                                        // db có , requets có => update 
                     {
-                        var imageItem = productBase.ProductImages.FirstOrDefault(s => s.Id == image.Id);
+                         var imageItem = productBase.ProductImages.FirstOrDefault(s => s.Id == image.Id);
 
                         if (imageItem != null)
                         {
@@ -203,10 +203,10 @@ namespace food_service.ProductService.Infastructure.Repositories
 
                 }
 
-                // Db có , reuqest không có  => xóa
-                //  var ImageProductId = product.ProductImagesEntities.Select(s => s.Id).ToList();
-                //var listImageRemove = productBase.ProductImages.Where(s => !ImageProductId.Any(t => s.Id == t)).ToList();
-                //_db.RemoveRange(listImageRemove);
+                //    Db có, reuqest không có  => xóa
+                var ImageProductId = product.ProductImagesEntities.Select(s => s.Id).ToList();
+                var listImageRemove = productBase.ProductImages.Where(s => !ImageProductId.Any(t => s.Id == t)).ToList();
+                _db.RemoveRange(listImageRemove);
 
 
 

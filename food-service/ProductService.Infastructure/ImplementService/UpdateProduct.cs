@@ -32,7 +32,7 @@ namespace food_service.ProductService.Infastructure.ImplementService
         public async Task Excute(UpdateProductDTO productRequest)
         {
 
-            var product = await _db.Products.Include(s=>s.ProductVariants).Include(s=>s.ProductImages).Where(s => s.Id == productRequest.IdProduct).FirstOrDefaultAsync();
+            var product = await _db.Products.Include(s => s.ProductVariants).Include(s => s.ProductImages).Where(s => s.Id == productRequest.IdProduct).FirstOrDefaultAsync();
 
 
 
@@ -67,7 +67,7 @@ namespace food_service.ProductService.Infastructure.ImplementService
             {
                 foreach (var image in productRequest.AddnewImagesProducts)
                 {
-                     var  nameImage = await _minIO.UploadAsync(image.images);
+                    var nameImage = await _minIO.UploadAsync(image.images);
                     productAggregate.AddNewImage(ProductImagesEntity.CreateNewImage(productAggregate.Id, nameImage, image.IsMain));
                 }
             }
@@ -77,19 +77,24 @@ namespace food_service.ProductService.Infastructure.ImplementService
             {
                 foreach (var imageId in productRequest.DeleteImage)
                 {
-                    var image = productAggregate.ProductImagesEntities
-                        .FirstOrDefault(x => x.Id == imageId);
+                    var image = productAggregate.ProductImagesEntities.FirstOrDefault(x => x.Id == imageId);
+
+                    if (image != null)
+                    {
+                        var imageEntity = productAggregate.ProductImagesEntities.FirstOrDefault(s => s.Id == image.Id);
+                        if (imageEntity != null)
+                        {
+                            productAggregate.DeleteImage(imageEntity);
+                        }
+                    }
 
                     if (image != null)
                     {
                         await _minIO.DeleteAsync(image.ImageUrl);
-                      
                     }
                 }
             }
             await _product.UpdateProductAsync(productAggregate);
         }
-
-
     }
 }
