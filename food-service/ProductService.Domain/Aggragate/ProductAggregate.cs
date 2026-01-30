@@ -114,5 +114,11 @@ namespace food_service.ProductService.Domain.Aggragate
             productImagesEntities.Remove(image);
         }
 
+        public void DeleteVariant(ProductVariantEntity variant)
+        {
+            productVariantEntities.Remove(variant);
+        }
+
+
     }
 }

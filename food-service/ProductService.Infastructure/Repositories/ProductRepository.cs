@@ -1,5 +1,6 @@
 ﻿
 using CommunityToolkit.HighPerformance.Helpers;
+using Elastic.Clients.Elasticsearch.Snapshot;
 using food_service.ProductService.API.GlobalExceptions;
 using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Domain.Aggragate;
@@ -9,6 +10,7 @@ using food_service.ProductService.Domain.ValueOject;
 using food_service.ProductService.Infastructure.Models;
 using food_service.ProductService.Infastructure.ProducerRabbitMQ;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -31,7 +33,7 @@ namespace food_service.ProductService.Infastructure.Repositories
 
         public async Task<bool> AddProductAsync(ProductAggregate product)
         {
-            _logger.LogInformation("Begin add new product ");
+            _logger.LogInformation("Begin add new productRequest ");
             var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
@@ -114,7 +116,7 @@ namespace food_service.ProductService.Infastructure.Repositories
 
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
-                _logger.LogInformation("write new product into OutBoxTable Successful");
+                _logger.LogInformation("write new productRequest into OutBoxTable Successful");
                 return true;
             }
             catch (Exception s)
@@ -152,77 +154,131 @@ namespace food_service.ProductService.Infastructure.Repositories
             }
         }
 
-        // cập nhật product aggregate
-        public async Task UpdateProductAsync(ProductAggregate product)
+        // update  productRequest aggregate
+        public async Task UpdateProductAsync(ProductAggregate productRequest)
         {
 
-            _logger.LogInformation("Start update product ");
-            var productBase = await _db.Products.Include(s => s.ProductVariants).Include(s => s.ProductImages).FirstOrDefaultAsync(p => p.Id == product.Id);
+            _logger.LogInformation("Start update productRequest ");
+            var productBase = await _db.Products.Include(s => s.ProductVariants).Include(s => s.ProductImages).FirstOrDefaultAsync(p => p.Id == productRequest.Id);
 
 
             if (productBase == null)
             {
-                _logger.LogError($"Can not  find product with Id {product.Id}");
-                throw new ProductNotFoundException($"ProductDTO with id {product.Id} not found");
+                _logger.LogError($"Can not  find productRequest with Id {productRequest.Id}");
+                throw new ProductNotFoundException($"ProductDTO with id {productRequest.Id} not found");
             }
             else
             {
-                productBase.Name = product.NameProduct.Value;
-                productBase.Description = product.Description;
-                productBase.Price = product.PriceProduct.Value;
-                productBase.IsAvailable = product.IsAvailable;
-                productBase.UpdatedAt = product.UpdatedAt;
-                productBase.IsDeleted = product.IsDeleted;
+                productBase.Name = productRequest.NameProduct.Value;
+                productBase.Description = productRequest.Description;
+                productBase.Price = productRequest.PriceProduct.Value;
+                productBase.IsAvailable = productRequest.IsAvailable;
+                productBase.UpdatedAt = productRequest.UpdatedAt;
+                productBase.IsDeleted = productRequest.IsDeleted;
 
 
+                // image 
 
 
-                foreach (var image in product.ProductImagesEntities)
+                var imageDict = productBase.ProductImages.ToDictionary(s => s.Id);
+
+                foreach (var imageReq in productRequest.ProductImagesEntities)
                 {
-                    if (!productBase.ProductImages.Any(s => s.Id == image.Id))   // db không có , request có  => thêm 
+
+                    if (!imageDict.TryGetValue(imageReq.Id, out var existingImage))
                     {
-                        _db.ProductImages.Add(new ProductImage()
+
+                        _db.ProductImages.Add(new ProductImage
                         {
-                            Id = image.Id,
-                            ProductId = image.ProductId,
-                            ImageUrl = image.ImageUrl,
-                            IsMain = image.IsMain
+
+                            Id = imageReq.Id,
+                            ProductId = productBase.Id,
+                            ImageUrl = imageReq.ImageUrl,
+                            IsMain = imageReq.IsMain
                         });
                     }
-                    else                                                        // db có , requets có => update 
+                    else
                     {
-                         var imageItem = productBase.ProductImages.FirstOrDefault(s => s.Id == image.Id);
 
-                        if (imageItem != null)
-                        {
-                            imageItem.ImageUrl = image.ImageUrl;
-                            imageItem.IsMain = image.IsMain;
-                        }
-
+                        existingImage.ImageUrl = imageReq.ImageUrl;
+                        existingImage.IsMain = imageReq.IsMain;
                     }
-
                 }
 
                 //    Db có, reuqest không có  => xóa
-                var ImageProductId = product.ProductImagesEntities.Select(s => s.Id).ToList();
-                var listImageRemove = productBase.ProductImages.Where(s => !ImageProductId.Any(t => s.Id == t)).ToList();
-                _db.RemoveRange(listImageRemove);
+                var listProductID = productRequest.ProductImagesEntities.Select(s => s.Id).ToHashSet();
+
+                var _listImageRemove = productBase.ProductImages.Where(s => !listProductID.Contains(s.Id)).ToList();
+
+                if (_listImageRemove.Any()) _db.RemoveRange(_listImageRemove);
 
 
+
+
+
+                // variant 
+                var variantDict = productBase.ProductVariants.ToDictionary(v => v.Id);
+
+
+                foreach (var variantItem in productRequest.ProductVariantEntities)
+                {
+                    if (!variantDict.TryGetValue(variantItem.Id, out var variantEntity))
+                    {
+
+                        _db.ProductVariants.Add(new ProductVariant
+                        {
+                            Id = variantItem.Id,
+                            ProductId = variantItem.ProductId,
+                            Name = variantItem.VariantName.Value,
+                            ExtraPrice = variantItem.ExtraPrice.Value,
+                            IsActive = variantItem.IsActive,
+                            CreatedAt = variantItem.CreateAt,
+                            UpdatedAt = variantItem.UpdateAt
+                        });
+                    }
+                    else
+                    {
+
+                        if (variantItem.ExtraPrice != null) variantEntity.ExtraPrice = variantItem.ExtraPrice.Value;
+
+
+                        if (variantItem.VariantName != null) variantEntity.Name = variantItem.VariantName.Value;
+
+                        variantEntity.IsActive = variantItem.IsActive;
+                        variantEntity.UpdatedAt = variantItem.UpdateAt;
+                    }
+                }
+
+
+                //remove variant 
+
+
+                var variantIds = productRequest.ProductVariantEntities.Select(s => s.Id).ToHashSet();
+
+                var listVariantRemove = productBase.ProductVariants.Where(v => !variantIds.Contains(v.Id)).ToList();
+
+                if (listVariantRemove.Any()) _db.RemoveRange(listVariantRemove);
 
 
                 var result = await _db.SaveChangesAsync() > 0;
                 if (result)
                 {
-                    _logger.LogInformation($"update product id  {product.Id} Successful");
+                    _logger.LogInformation($"update productRequest id  {productRequest.Id} Successful");
                 }
                 else
                 {
-                    _logger.LogInformation($"update product id  {product.Id} fail");
+                    _logger.LogInformation($"update productRequest id  {productRequest.Id} fail");
                 }
 
             }
 
         }
     }
+
+
 }
+/*   note
+ Các tiêu chí lựa chọn  Collections
+   + Nếu muốn lấy và cập nhật ,   xóa thì => Directory
+   + Nếu muốn chỉ cần kiểm tra sự tồn tại ( Contain() ) => HashSet
+ */

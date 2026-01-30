@@ -9,6 +9,7 @@ using food_service.ProductService.Domain.ValueOject;
 using food_service.ProductService.Infastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Minio;
+using RabbitMQ.Client;
 
 namespace food_service.ProductService.Infastructure.ImplementService
 {
@@ -72,7 +73,7 @@ namespace food_service.ProductService.Infastructure.ImplementService
                 }
             }
 
-
+            // remove image 
             if (productRequest.DeleteImage != null && productRequest.DeleteImage.Any())
             {
                 foreach (var imageId in productRequest.DeleteImage)
@@ -88,12 +89,36 @@ namespace food_service.ProductService.Infastructure.ImplementService
                         }
                     }
 
-                    if (image != null)
+                    if (image != null)  // remove image in minio
                     {
                         await _minIO.DeleteAsync(image.ImageUrl);
                     }
                 }
             }
+
+
+            // add new variant 
+            if (productRequest.AddNewVariantDTOs != null && productRequest.AddNewVariantDTOs.Any())
+            {
+                foreach (var variantItem in productRequest.AddNewVariantDTOs)
+                {
+                    productAggregate.AddNewVariant(ProductVariantEntity.CreateNewVariant(product.Id, new Name(variantItem.Name), new Price(variantItem.ExtraPrice), variantItem.IsMain));
+                }
+            }
+
+
+            // remove variant 
+            if (productRequest.DeleteVariant != null && productRequest.DeleteVariant.Any())
+            {
+                var deleteVariant = productAggregate.ProductVariantEntities.Where(s => productRequest.DeleteVariant.Contains(s.Id)).ToList();  // get list need to delete
+
+                foreach (var item in deleteVariant)
+                {
+                    productAggregate.DeleteVariant(item);
+                }
+            }
+
+
             await _product.UpdateProductAsync(productAggregate);
         }
     }
