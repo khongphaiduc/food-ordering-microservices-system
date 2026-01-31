@@ -29,7 +29,7 @@ namespace food_service.ProductService.Start
 
             var builder = WebApplication.CreateBuilder(args);
 
-            ////serilog 
+            //serilog 
             builder.Host.UseSerilog((context, services, configuration) =>
             {
                 configuration
@@ -72,9 +72,9 @@ namespace food_service.ProductService.Start
 
             builder.Services.AddScoped<IOutBoxPatternProduct, OutBoxPatternProduct>();
 
-            builder.Services.AddScoped<IMinIOFood,MinIOFood>();
+            builder.Services.AddScoped<IMinIOFood, MinIOFood>();
 
-          //  builder.Services.Add
+            //  builder.Services.Add
 
             //redis 
 
@@ -106,7 +106,7 @@ namespace food_service.ProductService.Start
 
 
             //backgroundSerivce
-            //builder.Services.AddHostedService<OutboxMessageProcessor>();
+            builder.Services.AddHostedService<OutboxMessageProcessor>();
 
             builder.Services.AddControllers();
 
