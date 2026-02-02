@@ -85,12 +85,10 @@ namespace food_service.ProductService.Start
                 options.Configuration = builder.Configuration["RedisAddress"];
                 options.InstanceName = "FoodTrungDuc";
             });
+
             // Redis lock
             builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
               ConnectionMultiplexer.Connect(builder.Configuration["RedisAddress"]!));
-
-
-
 
             //MinIO 
 

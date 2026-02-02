@@ -27,8 +27,8 @@ namespace food_service.ProductService.API.Controllers
         public async Task<IActionResult> GetListProduct([FromQuery] RequestGetListProduct request)
         {
             var listProduct = await _iListProduct.ExecuteAsync(request);
-
-            return Ok(listProduct);
+            var totalProduct = await _iListProduct.TotalProdut();
+            return Ok(new { list = listProduct, totalProduct = totalProduct });
         }
 
 

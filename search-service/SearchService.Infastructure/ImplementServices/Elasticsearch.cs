@@ -22,14 +22,14 @@ namespace search_service.SearchService.Infastructure.ImplementServices
 
         public async Task<bool> AddNewProduct(ProductDoc product)
         {
-            var result = await _elasticsearchClient.IndexAsync(product, s => s.Index("products").Id(product.Id));
+            var result = await _elasticsearchClient.IndexAsync(product, s => s.Index("menu").Id(product.Id));
 
             return result.IsValidResponse;
         }
 
         public async Task<bool> DeleteProduct(ProductDoc product)
         {
-            var response = await _elasticsearchClient.DeleteAsync<ProductDoc>(product.Id.ToString(), d => d.Index("products"));
+            var response = await _elasticsearchClient.DeleteAsync<ProductDoc>(product.Id.ToString(), d => d.Index("menu"));
             return response.IsValidResponse;
         }
 
@@ -37,7 +37,7 @@ namespace search_service.SearchService.Infastructure.ImplementServices
         {
             var response = await _elasticsearchClient.GetAsync<ProductDoc>(
                 id.ToString(),
-                g => g.Index("products")
+                g => g.Index("menu")
             );
 
             if (!response.Found) return null;
@@ -61,7 +61,7 @@ namespace search_service.SearchService.Infastructure.ImplementServices
             var size = 10;
             var number = (indexPage - 1) * 10;
 
-            var result = await _elasticsearchClient.SearchAsync<ProductDoc>(s => s.Index("products").From(number).Size(size)
+            var result = await _elasticsearchClient.SearchAsync<ProductDoc>(s => s.Index("menu").From(number).Size(size)
                .Query(q => q
                .QueryString(qs => qs
                   .Query(key)
@@ -86,7 +86,7 @@ namespace search_service.SearchService.Infastructure.ImplementServices
 
         public async Task UpdateProduct(ProductDoc product)
         {
-            await _elasticsearchClient.IndexAsync(product, s => s.Index("products").Id(product.Id));
+            await _elasticsearchClient.IndexAsync(product, s => s.Index("menu").Id(product.Id));
         }
     }
 }

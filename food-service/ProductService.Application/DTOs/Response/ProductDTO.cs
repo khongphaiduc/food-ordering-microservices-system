@@ -8,6 +8,7 @@
 
         public decimal Price { get; set; }
 
+        public string? Decriptions { get; set; }
         public string UrlImageMain { get; set; }
 
         public bool IsAvailable { get; set; }   // còn bán hay không

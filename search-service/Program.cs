@@ -52,6 +52,8 @@ namespace search_service
                  .ServerCertificateValidationCallback((sender, cert, chain, errors) => true);
             var client = new ElasticsearchClient(settings);  // là object trung tâm để [Search , index , update, delete]
 
+
+            builder.Services.AddSingleton<ISuggestSearch, SuggestSearch>();
             builder.Services.AddSingleton(client);
 
 

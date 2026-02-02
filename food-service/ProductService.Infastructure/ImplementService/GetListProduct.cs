@@ -1,9 +1,11 @@
 ﻿using food_service.ProductService.Application.DTOs.Request;
 using food_service.ProductService.Application.DTOs.Response;
+using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Application.Service;
 using food_service.ProductService.Infastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Minio;
 using System.Net.WebSockets;
 
 namespace food_service.ProductService.Infastructure.ImplementService
@@ -12,11 +14,15 @@ namespace food_service.ProductService.Infastructure.ImplementService
     {
         private readonly FoodProductsDbContext _db;
         private readonly IDistributedCache _redisCatch;
+        private readonly IConfiguration _config;
+        private readonly IMinIOFood _minio;
 
-        public GetListProduct(FoodProductsDbContext foodProductsDbContext, IDistributedCache _RedisCache)
+        public GetListProduct(FoodProductsDbContext foodProductsDbContext, IDistributedCache _RedisCache, IConfiguration config, IMinIOFood minioClient)
         {
             _db = foodProductsDbContext;
             _redisCatch = _RedisCache;
+            _config = config;
+            _minio = minioClient;
         }
 
         // search và phân trang
@@ -49,12 +55,28 @@ namespace food_service.ProductService.Infastructure.ImplementService
                     Name = p.Name,
                     Price = p.Price,
                     UrlImageMain = p.ProductImages.Where(img => img.IsMain).Select(img => img.ImageUrl).FirstOrDefault() ?? "https://img6.thuthuatphanmem.vn/uploads/2022/04/16/anh-rose-blackpink-cute-xinh_042754601.jpg",
-                    IsAvailable = p.IsAvailable
+                    IsAvailable = p.IsAvailable,
+                    Decriptions = p.Description
                 })
                 .ToListAsync();
+
+
+            var tasks = listProduct.Select(async p =>
+            {
+                p.UrlImageMain = await _minio.GetUrlImage(
+                    _config["Minio:Bucket"]!,
+                    p.UrlImageMain
+                );
+            });
+
+            await Task.WhenAll(tasks);
 
             return listProduct;
         }
 
+        public async Task<int> TotalProdut()
+        {
+            return await _db.Products.CountAsync();
+        }
     }
 }

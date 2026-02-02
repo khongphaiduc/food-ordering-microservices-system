@@ -7,5 +7,6 @@ namespace food_service.ProductService.Application.Service
     public interface IGetListProduct
     {
         Task<List<ProductDTO>> ExecuteAsync(RequestGetListProduct request);
+        Task<int> TotalProdut();
     }
 }
