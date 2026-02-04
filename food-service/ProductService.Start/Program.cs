@@ -74,6 +74,8 @@ namespace food_service.ProductService.Start
 
             builder.Services.AddScoped<IMinIOFood, MinIOFood>();
 
+            builder.Services.AddScoped<IProductRecommendationService, ProductRecommendationService>();
+
             //  builder.Services.Add
 
             //redis 

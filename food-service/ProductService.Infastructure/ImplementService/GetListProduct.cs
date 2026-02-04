@@ -51,6 +51,7 @@ namespace food_service.ProductService.Infastructure.ImplementService
             var listProduct = await query
                 .Select(p => new ProductDTO
                 {
+                    IdCategory = p.CategoryId,
                     Id = p.Id.ToString(),
                     Name = p.Name,
                     Price = p.Price,

@@ -14,11 +14,13 @@ namespace food_service.ProductService.API.Controllers
     {
         private readonly IGetListProduct _iListProduct;
         private readonly IViewDetailProduct _iViewDetailProduct;
+        private readonly IProductRecommendationService _recommentionProduct;
 
-        public ProductsController(IGetListProduct listProduct, IViewDetailProduct viewDetailProduct)
+        public ProductsController(IGetListProduct listProduct, IViewDetailProduct viewDetailProduct, IProductRecommendationService productRecommendationService)
         {
             _iListProduct = listProduct;
             _iViewDetailProduct = viewDetailProduct;
+            _recommentionProduct = productRecommendationService;
         }
 
 
@@ -50,5 +52,12 @@ namespace food_service.ProductService.API.Controllers
 
         }
 
+        [HttpGet("recommendation/{idCategory}")]
+        public async Task<IActionResult> GetProductRecommendation([FromRoute] Guid idCategory)
+        {
+            var listProductRecommendation = await _recommentionProduct.ExecuteAsync(idCategory);
+            return Ok(listProductRecommendation);
+
+        }
     }
 }

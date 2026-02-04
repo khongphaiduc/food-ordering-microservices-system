@@ -21,7 +21,7 @@ namespace food_service.ProductService.Infastructure.ImplementService
 
             var product = await _db.Products.AsSplitQuery().Where(s => s.Id == idProduct).Select(s => new ProductDetailDTO
             {
-
+                IdCategory = s.CategoryId,
                 IdProduct = s.Id,
                 Description = s.Description ?? "None",
                 Price = s.Price,
