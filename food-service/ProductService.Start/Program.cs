@@ -84,7 +84,7 @@ namespace food_service.ProductService.Start
 
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = builder.Configuration["RedisAddress"];
+                options.Configuration = builder.Configuration["Redis:RedisAddress"];
                 options.InstanceName = "FoodTrungDuc";
             });
 
@@ -106,7 +106,7 @@ namespace food_service.ProductService.Start
 
 
             //backgroundSerivce
-            builder.Services.AddHostedService<OutboxMessageProcessor>();
+            //builder.Services.AddHostedService<OutboxMessageProcessor>();
 
             builder.Services.AddControllers();
 

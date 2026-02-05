@@ -6,7 +6,8 @@
 
         public string Name { get; set; }
 
-
         public decimal? ExtraPrice { get; set; }
+
+        public string TypeProduct { get; set; } 
     }
 }

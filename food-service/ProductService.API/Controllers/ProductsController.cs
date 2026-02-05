@@ -49,7 +49,6 @@ namespace food_service.ProductService.API.Controllers
             {
                 return NotFound($"Not Found Product Id : {idProduct}");
             }
-
         }
 
         [HttpGet("recommendation/{idCategory}")]
