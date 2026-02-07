@@ -1,3 +1,4 @@
+using food_service.ProductService.API.gRPC;
 using food_service.ProductService.API.Middlwares;
 using food_service.ProductService.Application.Interface;
 using food_service.ProductService.Application.Service;
@@ -76,7 +77,7 @@ namespace food_service.ProductService.Start
 
             builder.Services.AddScoped<IProductRecommendationService, ProductRecommendationService>();
 
-            //  builder.Services.Add
+
 
             //redis 
 
@@ -104,6 +105,7 @@ namespace food_service.ProductService.Start
             });
 
 
+            builder.Services.AddGrpc();
 
             //backgroundSerivce
             //builder.Services.AddHostedService<OutboxMessageProcessor>();
@@ -111,6 +113,8 @@ namespace food_service.ProductService.Start
             builder.Services.AddControllers();
 
             var app = builder.Build();
+
+            app.MapGrpcService<ProductInformationsServices>();
 
             app.UseRateLimiter();
 
