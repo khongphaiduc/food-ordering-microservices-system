@@ -1,18 +1,25 @@
+using Microsoft.EntityFrameworkCore;
+using order_service.OrderService.Infastructure.Models;
+
 namespace order_service
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            DotNetEnv.Env.Load();
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddDbContext<FoodOrderContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration["URLORDER"]);
+            });
 
             builder.Services.AddControllers();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+
 
             app.UseHttpsRedirection();
 
