@@ -1,18 +1,46 @@
+using cart_service.CartService.API.gRPC;
+using cart_service.CartService.Application.Services;
+using cart_service.CartService.Domain.Interface;
+using cart_service.CartService.Infastructure.ImplementServices;
+using cart_service.CartService.Infastructure.Mapper;
+using cart_service.CartService.Infastructure.Models;
+using cart_service.CartService.Infastructure.Repository;
+using Microsoft.EntityFrameworkCore;
+using productService.API.Protos;
+
 namespace cart_service
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            DotNetEnv.Env.Load();
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddDbContext<FoodProductsDbContext>(options =>
+            {
+                options.UseNpgsql(builder.Configuration["URLCARTSQL"]);
+            });
+
+
+            builder.Services.AddScoped<IMapModel, MapModel>();
+            builder.Services.AddScoped<ICartRepository, CartRepository>();
+            builder.Services.AddScoped<ICreateNewCart, CreateNewCart>();
+            builder.Services.AddScoped<IUpdateCartFood, UpdateCartFood>();
+
 
             builder.Services.AddControllers();
 
-            var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            builder.Services.AddScoped<CartServiceClient>();
+
+            builder.Services.AddGrpcClient<ProductInfoGrpc.ProductInfoGrpcClient>(s =>
+            {
+                s.Address = new Uri("https://localhost:7081");
+            });
+
+
+            var app = builder.Build();
 
             app.UseHttpsRedirection();
 

@@ -1,0 +1,39 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "productService.API.Protos";
+
+package productservice;
+
+service ProductInfoGrpc {
+  rpc GetInformationProducts (ProductRequestList) returns (ProductDetailList);
+}
+
+message ProductRequestList {
+  repeated string productId = 1;
+}
+
+message ProductDetailList {
+  repeated ProductDetail productDetail = 1;
+}
+
+message ProductDetail {
+  string idCategory = 1;
+  string idProduct = 2;
+  string description = 3;
+  double price = 4;
+  string Name = 5;
+  string statusCode = 6;
+  repeated ProductImage productImages = 7;
+  repeated ProductVariant productVariants = 8;
+}
+message ProductImage {
+  string idImage = 1;
+  string urlImage = 2;
+}
+
+message ProductVariant {
+  string idVariant = 1;
+  string name = 2;
+  double extraPrice = 3;
+  string typeProduct = 4;
+}
