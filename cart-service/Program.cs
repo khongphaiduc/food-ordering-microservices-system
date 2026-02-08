@@ -27,7 +27,7 @@ namespace cart_service
             builder.Services.AddScoped<ICartRepository, CartRepository>();
             builder.Services.AddScoped<ICreateNewCart, CreateNewCart>();
             builder.Services.AddScoped<IUpdateCartFood, UpdateCartFood>();
-
+            builder.Services.AddScoped<IGetCartForUser, GetCartForUser>();
 
             builder.Services.AddControllers();
 

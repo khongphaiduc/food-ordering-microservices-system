@@ -11,6 +11,8 @@ namespace cart_service.CartService.Application.DTOs
 
     public partial class CartItemrDTO
     {
+        public Guid IdCartItem { get; set; }
+
         public Guid ProductId { get; set; }
 
         public Guid? VariantId { get; set; }

@@ -103,14 +103,27 @@ namespace cart_service.CartService.Infastructure.ImplementServices
 
                 foreach (var item in request.CartItems)
                 {
-                    var cartItem = carAggregate.CartItemList
-                        .FirstOrDefault(c => c.ProductId == item.ProductId && c.VariantId == item.VariantId);
+                    // bug
+
+                    if (item.VariantId == Guid.Empty)
+                    {
+                        item.VariantId = null;
+                    }
+
+                    var cartItem = carAggregate.CartItemList.FirstOrDefault(c => c.ProductId == item.ProductId && (
+                              (c.VariantId == null && item.VariantId == null) ||
+                              (c.VariantId != null && c.VariantId == item.VariantId)
+                       ));
+
+
+
 
                     if (cartItem != null)
                     {
                         cartItem.ChangeQuantity(item.Quantity);
                         continue;
                     }
+
 
                     var product = Products.FirstOrDefault(p => p.IdProduct == item.ProductId);
                     if (product == null) throw new Exception($"Product {item.ProductId} not found");

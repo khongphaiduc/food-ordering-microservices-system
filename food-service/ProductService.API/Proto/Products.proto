@@ -6,6 +6,8 @@ package productservice;
 
 service ProductInfoGrpc {
   rpc GetInformationProducts (ProductRequestList) returns (ProductDetailList);
+
+  rpc GetImageProducts (GetImageProductsRequest) returns (GetURLImageResponse);
 }
 
 message ProductRequestList {
@@ -37,4 +39,18 @@ message ProductVariant {
   string name = 2;
   double extraPrice = 3;
   string typeProduct = 4;
+}
+
+
+message GetImageProductsRequest {
+  repeated string idProduct = 1;
+}
+
+message GetURLImageResponse {
+  repeated ProductInfor productInfors = 1;
+}
+
+message ProductInfor{
+	string idProduct = 1;
+	string urlImage = 2;
 }

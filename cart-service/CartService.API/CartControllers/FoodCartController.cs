@@ -18,13 +18,15 @@ namespace cart_service.CartService.API.CartControllers
         private readonly ICreateNewCart _cart;
         private readonly CartServiceClient _product;
         private readonly IUpdateCartFood _updateCart;
+        private readonly IGetCartForUser _viewCart;
 
-        public FoodCartController(FoodProductsDbContext foodProductsDbContext, ICreateNewCart createNewCart, CartServiceClient cartServiceClient, IUpdateCartFood updateCartFood)
+        public FoodCartController(FoodProductsDbContext foodProductsDbContext, ICreateNewCart createNewCart, CartServiceClient cartServiceClient, IUpdateCartFood updateCartFood, IGetCartForUser getCartForUser)
         {
             _db = foodProductsDbContext;
             _cart = createNewCart;
             _product = cartServiceClient;
             _updateCart = updateCartFood;
+            _viewCart = getCartForUser;
         }
 
         [HttpGet("test")]
@@ -59,11 +61,18 @@ namespace cart_service.CartService.API.CartControllers
         }
 
         [HttpPost("update-cart")]
-        public async Task<IActionResult> TestAddProductIntoCart([FromBody]RequestUpdateCartFood request)
+        public async Task<IActionResult> TestAddProductIntoCart([FromBody] RequestUpdateCartFood request)
         {
             await _updateCart.Excute(request);
             return Ok();
         }
 
+        [HttpGet("user-cart/{idUser}")]
+        public async Task<IActionResult> GetCartUser([FromRoute] Guid idUser)
+        {
+
+            var cart = await _viewCart.Excute(idUser);
+            return Ok(cart);
+        }
     }
 }

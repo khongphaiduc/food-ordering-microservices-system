@@ -72,7 +72,8 @@ namespace cart_service.CartService.Infastructure.Repository
                     }
                     else                                       // update
                     {
-                       
+                        if (item.Quantitys.Value == 0) continue;
+                        
                         var cartItemUpdate = cartBase.CartItems.FirstOrDefault(s => s.Id == item.Id);
 
                         if (cartItemUpdate != null)
@@ -91,17 +92,15 @@ namespace cart_service.CartService.Infastructure.Repository
 
                 // request không có , database có , => xóa
 
-                foreach (var item in cartNewAggregate.CartItemList)
+                var newIds = cartNewAggregate.CartItemList.Where(s => s.Quantitys.Value <= 0).Select(i => i.Id).ToHashSet();
+
+                var removedItems = cartBase.CartItems
+                    .Where(dbItem => newIds.Contains(dbItem.Id))
+                    .ToList();
+
+                foreach (var item in removedItems)
                 {
-                    if (item.Quantitys.Value == 0)
-                    {
-                        var cartItemDelete = cartBase.CartItems.FirstOrDefault(s => s.Id == item.Id);
-                        if (cartItemDelete != null)
-                        {
-                            _db.CartItems.Remove(cartItemDelete);
-                        }
-                        continue;
-                    }
+                    _db.CartItems.Remove(item);
                 }
 
                 await _db.SaveChangesAsync();

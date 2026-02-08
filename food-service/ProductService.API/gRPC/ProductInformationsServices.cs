@@ -1,4 +1,5 @@
-﻿using food_service.ProductService.Infastructure.Models;
+﻿using food_service.ProductService.Application.Interface;
+using food_service.ProductService.Infastructure.Models;
 using Google.Protobuf;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
@@ -8,14 +9,16 @@ namespace food_service.ProductService.API.gRPC
 {
     public class ProductInformationsServices : ProductInfoGrpc.ProductInfoGrpcBase
     {
+        private readonly IMinIOFood _minIo;
         private readonly FoodProductsDbContext _db;
 
-        public ProductInformationsServices(FoodProductsDbContext foodProductsDbContext)
+        public ProductInformationsServices(FoodProductsDbContext foodProductsDbContext, IMinIOFood minIOFood)
         {
+            _minIo = minIOFood;
             _db = foodProductsDbContext;
         }
 
-        public override async Task<ProductDetailList> GetInformationProducts(ProductRequestList request, ServerCallContext context  )
+        public override async Task<ProductDetailList> GetInformationProducts(ProductRequestList request, ServerCallContext context)
         {
             var productIds = request.ProductId
                 .Select(Guid.Parse)
@@ -70,7 +73,29 @@ namespace food_service.ProductService.API.gRPC
             return response;
         }
 
+        public override async Task<GetURLImageResponse> GetImageProducts(GetImageProductsRequest request, ServerCallContext context)
+        {
+            var productIds = request.IdProduct;
 
+            var listImageMainProduct = await _db.ProductImages
+                .Where(s => s.IsMain && productIds.Contains(s.ProductId.ToString()))
+                .ToListAsync();
+
+            var response = new GetURLImageResponse();
+
+            var productInforTasks = listImageMainProduct.Select(async s => new ProductInfor
+            {
+                IdProduct = s.ProductId.ToString(),
+                UrlImage = await _minIo.GetUrlImage("images", s.ImageUrl)
+            });
+
+            var productInfors = await Task.WhenAll(productInforTasks);
+
+            response.ProductInfors.AddRange(productInfors);
+
+            return response;
+
+        }
 
     }
 }
