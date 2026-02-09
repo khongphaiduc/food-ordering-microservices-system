@@ -22,7 +22,7 @@ namespace cart_service.CartService.Infastructure.ImplementServices
             _createCart = createNewCart;
             _logger = logger;
         }
-
+        #region get cart if not exist create new cart
         public async Task<ResponseViewCartUser> Excute(Guid idUser)
         {
 
@@ -87,5 +87,6 @@ namespace cart_service.CartService.Infastructure.ImplementServices
             return cart;
 
         }
+        #endregion 
     }
 }

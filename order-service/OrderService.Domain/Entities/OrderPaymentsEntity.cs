@@ -1,4 +1,7 @@
-﻿namespace order_service.OrderService.Domain.Entities
+﻿using order_service.OrderService.Domain.Enums;
+using order_service.OrderService.Domain.OjectValue;
+
+namespace order_service.OrderService.Domain.Entities
 {
     public class OrderPaymentsEntity
     {
@@ -6,39 +9,78 @@
 
         public Guid IdOrder { get; private set; }
 
-        public string TransactionId { get; private set; } = null!; // mã code do cổng thanh toán trả về
 
-        public DateTime PaidAt { get; private set; }  //  thời điểm ngân hàng báo thành toán thành công
-
-        public DateTime CreateAt { get; private set; }  // lúc tạo đơn 
+        public PaymentMethod PaymentProvider { get; private set; }
 
 
-        public static OrderPaymentsEntity CreateOrderPayment(Guid idOrder, string transactionId, DateTime paidAt)
+        public PaymentStatus PaymentStatus { get; private set; }
+
+        public Price Amount { get; private set; }
+
+
+        public string TransactionId { get; private set; } = null!; // Mã giao dịch do cổng thanh toán trả về
+
+
+        public DateTime? PaidAt { get; private set; }// Thời điểm ngân hàng/cổng thanh toán xác nhận đã thanh toán
+
+
+        public DateTime CreatedAt { get; private set; }
+
+        #region Factory
+
+        public static OrderPaymentsEntity CreateOrderPayment(Guid idOrder, PaymentMethod PaymentProvider, PaymentStatus paymentStatus, decimal amount, string transactionId, DateTime? paidAt = null
+        )
         {
             return new OrderPaymentsEntity(
                 Guid.NewGuid(),
                 idOrder,
+                PaymentProvider,
+                paymentStatus,
+                new Price(amount),
                 transactionId,
                 paidAt,
                 DateTime.UtcNow
             );
         }
 
-        internal OrderPaymentsEntity(Guid idOrderPayment, Guid idOrder, string transactionId, DateTime paidAt, DateTime createAt)
-        {
-            if (string.IsNullOrWhiteSpace(transactionId))
-                throw new ArgumentException("TransactionId is required");
+        #endregion
 
+        #region Business Methods
+
+        public void MarkAsPaid(DateTime paidAt)
+        {
+            PaymentStatus = PaymentStatus.SUCCESS;
+            PaidAt = paidAt;
+        }
+
+        public void MarkAsFailed()
+        {
+            PaymentStatus = PaymentStatus.FAILED;
+            PaidAt = null;
+        }
+
+        #endregion
+
+        #region Constructors
+
+        private OrderPaymentsEntity(Guid idOrderPayment, Guid idOrder, PaymentMethod PaymentProvider, PaymentStatus paymentStatus, Price amount, string transactionId, DateTime? paidAt, DateTime createdAt)
+
+        {
             IdOrderPayment = idOrderPayment;
             IdOrder = idOrder;
+            this.PaymentProvider = PaymentProvider;
+            PaymentStatus = paymentStatus;
+            Amount = amount;
             TransactionId = transactionId;
             PaidAt = paidAt;
-            CreateAt = createAt;
+            CreatedAt = createdAt;
         }
+
 
         private OrderPaymentsEntity()
         {
         }
 
+        #endregion
     }
 }

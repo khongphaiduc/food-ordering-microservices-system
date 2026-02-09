@@ -82,7 +82,6 @@ namespace cart_service.CartService.Infastructure.ImplementServices
                             Name = g.Name,
                             ExtraPrice = (decimal)g.ExtraPrice,
                             TypeVariant = g.TypeProduct
-
                         }).ToList()
 
 

@@ -46,7 +46,7 @@ namespace order_service.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("PaymentMethod")
+                    b.Property<string>("PaymentProvider")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 

@@ -1,0 +1,11 @@
+﻿namespace order_service.OrderService.Domain.Enums
+{
+    public enum OrderStatus
+    {
+        PENDING = 1,
+        CONFIRMED = 2,
+        PAID = 3,
+        CANCELLED = 4,
+        DELIVERED = 5
+    }
+}

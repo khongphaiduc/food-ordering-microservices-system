@@ -23,14 +23,9 @@ namespace cart_service.CartService.API.gRPC
         {
             var grpcRequest = new GetImageProductsRequest();
 
-            grpcRequest.IdProduct.AddRange(
-                request.Select(x => x.IdProduct.ToString())
-            );
+            grpcRequest.IdProduct.AddRange(request.Select(x => x.IdProduct.ToString()));
 
-            var result = await _productInfoGrpcClient.GetImageProductsAsync(
-                grpcRequest,
-                deadline: DateTime.UtcNow.AddSeconds(5)
-            );
+            var result = await _productInfoGrpcClient.GetImageProductsAsync(grpcRequest, deadline: DateTime.UtcNow.AddSeconds(5));
 
             var productResult = result.ProductInfors.Select(s => new ProductInforgetImage
             {

@@ -28,7 +28,7 @@ namespace cart_service
             builder.Services.AddScoped<ICreateNewCart, CreateNewCart>();
             builder.Services.AddScoped<IUpdateCartFood, UpdateCartFood>();
             builder.Services.AddScoped<IGetCartForUser, GetCartForUser>();
-
+            builder.Services.AddScoped<CartInforService>();
             builder.Services.AddControllers();
 
 
@@ -39,9 +39,10 @@ namespace cart_service
                 s.Address = new Uri("https://localhost:7081");
             });
 
-
+            builder.Services.AddGrpc();
             var app = builder.Build();
 
+            app.MapGrpcService<CartInforService>();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

@@ -1,0 +1,41 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "CartService.API.Protos";
+
+package CartService;
+
+service CartInforGrpc {
+  rpc GetInformationCart (CartID) returns (Cart);
+}
+
+message CartID {
+  string IdCart = 1;
+}
+
+message Cart {
+  string IdCart = 1;
+  string UserId = 2;
+  string Status = 3;
+  int64 TotalPrice = 4;
+  repeated CartItem CartItems = 5;
+  repeated CartDiscount CartDiscounts = 6;	
+}
+
+message CartItem {
+  string CartId = 1;
+  string ProductId = 2;
+  string ProductName = 3;
+  string VariantId = 4;
+  string VariantName = 5;
+  int64 UnitPrice = 6;
+  int32 Quantity = 7;
+  int64 TotalPrice = 8;
+}
+
+
+message CartDiscount {
+  string CartId = 1;
+  string DiscountCode = 2;
+  int64 DiscountAmount = 3;	
+  int64 AmountAfterDiscount = 4;
+}
