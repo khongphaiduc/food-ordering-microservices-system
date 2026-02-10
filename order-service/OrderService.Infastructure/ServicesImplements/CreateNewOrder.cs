@@ -49,8 +49,13 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
             // payment 
             newCartAggregate.AddOrderPayment(OrderPaymentsEntity.CreateOrderPayment(newCartAggregate.IdOrder, paymentMethod, PaymentStatus.PENDING, newCartAggregate.FinalAmount.Value, null, null));
 
+            var resultCreateNewOrder = await _orderRepository.CreateNewOrder(newCartAggregate);  //   tạo order
 
-            return await _orderRepository.CreateNewOrder(newCartAggregate);
+            if (resultCreateNewOrder)
+            {
+                return await _cartClientGRPC.ChangeStatusCart(cart.CartId, StatusCart.CHECKED_OUT);  //  change status cart
+            }
+            return false;
 
         }
     }

@@ -1,4 +1,5 @@
-﻿using cart_service.CartService.Infastructure.Models;
+﻿using cart_service.CartService.Domain.Enums;
+using cart_service.CartService.Infastructure.Models;
 using CartService.API.Protos;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
@@ -52,5 +53,45 @@ namespace cart_service.CartService.API.gRPC
             return cartProto;
         }
         #endregion
+
+
+        public override async Task<StatusCartRespone> ChangeStatusCart(RequestChangeStatusCart request, ServerCallContext context)
+        {
+            var cart = await _db.Carts.FirstOrDefaultAsync(c => c.Id == Guid.Parse(request.IdCart) && c.Status == StatusCart.ACTIVE.ToString());
+
+            if (cart == null)
+            {
+                return new StatusCartRespone
+                {
+                    MessageStatus = "Cart not found or not active",
+                    Status = false,
+
+                };
+            }
+            else
+            {
+                var allowedNextStatuses = new[] { StatusCart.EXPIRED.ToString(), StatusCart.CHECKED_OUT.ToString() };  //  chỉ cho đổi ở trại thái này 
+
+                if (!allowedNextStatuses.Contains(request.StatusChange))
+                {
+                    return new StatusCartRespone
+                    {
+                        MessageStatus = "Invalid status change",
+                        Status = false,
+                    };
+                }
+
+                cart.Status = request.StatusChange;
+                cart.UpdatedAt = DateTime.UtcNow;
+                _db.Carts.Update(cart);
+                await _db.SaveChangesAsync();
+                return new StatusCartRespone
+                {
+                    MessageStatus = "Cart status updated successfully",
+                    Status = true,
+                };
+            }
+        }
+
     }
 }

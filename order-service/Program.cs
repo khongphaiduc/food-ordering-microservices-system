@@ -36,6 +36,7 @@ namespace order_service
 
             builder.Services.AddControllers();
 
+            builder.Services.AddGrpc();
             var app = builder.Build();
 
 

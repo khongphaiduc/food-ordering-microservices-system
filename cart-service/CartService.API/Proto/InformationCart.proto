@@ -6,6 +6,7 @@ package CartService;
 
 service CartInforGrpc {
   rpc GetInformationCart (CartID) returns (Cart);
+  rpc ChangeStatusCart(RequestChangeStatusCart) returns (StatusCartRespone);
 }
 
 message CartID {
@@ -32,10 +33,20 @@ message CartItem {
   int64 TotalPrice = 8;
 }
 
-
 message CartDiscount {
   string CartId = 1;
   string DiscountCode = 2;
   int64 DiscountAmount = 3;	
   int64 AmountAfterDiscount = 4;
+}
+
+message RequestChangeStatusCart{
+	string IdCart = 1;
+	string StatusChange = 2;
+}
+
+message StatusCartRespone{
+  string IdCart = 1;
+  bool Status = 2;                           // thành công hay thất bại
+  string messageStatus = 3;
 }

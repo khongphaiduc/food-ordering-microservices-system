@@ -36,5 +36,13 @@ namespace order_service.OrderService.API.OrderControllers
             var result = await _order.Excute(request.IdCart, methodPayment);
             return Ok(result);
         }
+
+        [HttpPut]
+        public IActionResult CancelCreateNewOrder(RequestCancelCreateNewOrder request)
+        {
+
+
+            return Ok();
+        }
     }
 }

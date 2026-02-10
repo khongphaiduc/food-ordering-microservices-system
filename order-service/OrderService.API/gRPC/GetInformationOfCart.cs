@@ -10,16 +10,33 @@ namespace order_service.OrderService.API.gRPC
     public class GetInformationOfCart
     {
         private readonly CartInforGrpc.CartInforGrpcClient _cartInforGrpcClient;
+        private readonly ILogger<GetInformationOfCart> _logger;
 
-        public GetInformationOfCart(CartInforGrpc.CartInforGrpcClient cartInforGrpcClient)
+        public GetInformationOfCart(CartInforGrpc.CartInforGrpcClient cartInforGrpcClient, ILogger<GetInformationOfCart> logger)
         {
             _cartInforGrpcClient = cartInforGrpcClient;
+            _logger = logger;
         }
 
         #region get information of cart
         public async Task<CartDTOsInternal> Excute(Guid IdCart)
         {
-            var cart = await _cartInforGrpcClient.GetInformationCartAsync(new CartID { IdCart = IdCart.ToString() });
+            global::CartService.API.Protos.Cart cart = new();
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    cart = await _cartInforGrpcClient.GetInformationCartAsync(new CartID { IdCart = IdCart.ToString() }, deadline: DateTime.UtcNow.AddSeconds(3));
+                    break;
+                }
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable || ex.StatusCode == StatusCode.DeadlineExceeded)
+                {
+                    _logger.LogError(ex, $"Error occurred while calling gRPC to get cart information for Cart ID: {IdCart}. Attempt {i + 1} of 3.");
+                    if (i == 2) throw;
+                    await Task.Delay(200);
+                }
+            }
+
             if (cart == null || cart.IdCart == Guid.Empty.ToString())
             {
                 return new CartDTOsInternal
@@ -60,5 +77,27 @@ namespace order_service.OrderService.API.gRPC
         }
         #endregion
 
+
+
+        #region change status cart
+        public async Task<bool> ChangeStatusCart(Guid IdCart, StatusCart statusCart)
+        {
+            var result = await _cartInforGrpcClient.ChangeStatusCartAsync(new global::CartService.API.Protos.RequestChangeStatusCart
+            {
+                IdCart = IdCart.ToString(),
+                StatusChange = statusCart.ToString()
+            });
+            if (result.Status)
+            {
+                _logger.LogInformation("Change status cart {IdCart} to {StatusChange}", IdCart, statusCart);
+            }
+            else
+            {
+                _logger.LogError("Failed to change status cart {IdCart} to {StatusChange}", IdCart, statusCart);
+            }
+
+            return result.Status;
+        }
+        #endregion
     }
 }
