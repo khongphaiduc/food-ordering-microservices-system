@@ -2,6 +2,7 @@
 using Grpc.Core;
 using Microsoft.IdentityModel.Tokens;
 using order_service.OrderService.Appilcation.DTOs.DTOsInternal;
+using order_service.OrderService.Domain.Enums;
 using System.Threading.Tasks;
 
 namespace order_service.OrderService.API.gRPC
@@ -34,7 +35,7 @@ namespace order_service.OrderService.API.gRPC
 
                 CartId = Guid.Parse(cart.IdCart),
                 UserId = Guid.Parse(cart.UserId),
-                Status = cart.Status,
+                Status = OrderStatus.PENDING,
                 TotalPrice = cart.TotalPrice,
                 CartItems = cart.CartItems.Select(x => new CartItemDTOsInternal
                 {

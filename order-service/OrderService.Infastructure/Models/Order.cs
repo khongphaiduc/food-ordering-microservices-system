@@ -9,6 +9,8 @@ public partial class Order
 
     public Guid UserId { get; set; }
 
+    public Guid CartId { get; set; }
+
     public string OrderCode { get; set; } = null!;
 
     public string Status { get; set; } = null!;

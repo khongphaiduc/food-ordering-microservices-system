@@ -4,7 +4,7 @@ namespace order_service.OrderService.Domain.Interface
 {
     public interface IOrderRepository
     {
-        Task CreateNewOrder(OrdersAggregate orders);
+        Task<bool> CreateNewOrder(OrdersAggregate orders);
 
         Task UpdateOrder(OrdersAggregate orders);
 

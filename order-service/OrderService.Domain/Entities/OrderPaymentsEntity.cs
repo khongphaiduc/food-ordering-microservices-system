@@ -18,7 +18,7 @@ namespace order_service.OrderService.Domain.Entities
         public Price Amount { get; private set; }
 
 
-        public string TransactionId { get; private set; } = null!; // Mã giao dịch do cổng thanh toán trả về
+        public string? TransactionId { get; private set; }  // Mã giao dịch do cổng thanh toán trả về
 
 
         public DateTime? PaidAt { get; private set; }// Thời điểm ngân hàng/cổng thanh toán xác nhận đã thanh toán
@@ -28,7 +28,7 @@ namespace order_service.OrderService.Domain.Entities
 
         #region Factory
 
-        public static OrderPaymentsEntity CreateOrderPayment(Guid idOrder, PaymentMethod PaymentProvider, PaymentStatus paymentStatus, decimal amount, string transactionId, DateTime? paidAt = null
+        public static OrderPaymentsEntity CreateOrderPayment(Guid idOrder, PaymentMethod PaymentProvider, PaymentStatus paymentStatus, decimal amount, string? transactionId, DateTime? paidAt = null
         )
         {
             return new OrderPaymentsEntity(
@@ -63,7 +63,7 @@ namespace order_service.OrderService.Domain.Entities
 
         #region Constructors
 
-        private OrderPaymentsEntity(Guid idOrderPayment, Guid idOrder, PaymentMethod PaymentProvider, PaymentStatus paymentStatus, Price amount, string transactionId, DateTime? paidAt, DateTime createdAt)
+        private OrderPaymentsEntity(Guid idOrderPayment, Guid idOrder, PaymentMethod PaymentProvider, PaymentStatus paymentStatus, Price amount, string? transactionId, DateTime? paidAt, DateTime createdAt)
 
         {
             IdOrderPayment = idOrderPayment;

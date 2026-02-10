@@ -1,4 +1,6 @@
-﻿namespace order_service.OrderService.Appilcation.DTOs.DTOsInternal
+﻿using order_service.OrderService.Domain.Enums;
+
+namespace order_service.OrderService.Appilcation.DTOs.DTOsInternal
 {
     public class CartDTOsInternal
     {
@@ -6,7 +8,7 @@
 
         public Guid UserId { get; set; }
 
-        public string Status { get; set; } = null!;
+        public OrderStatus Status { get; set; } 
 
         public long TotalPrice { get; set; }
 

@@ -16,7 +16,7 @@ namespace cart_service.CartService.API.gRPC
         #region Get information cart
         public override async Task<global::CartService.API.Protos.Cart> GetInformationCart(CartID request, ServerCallContext context)
         {
-            var cart = await _db.Carts.Include(s => s.CartItems).Include(s => s.CartDiscounts).FirstOrDefaultAsync(c => c.Id == Guid.Parse(request.IdCart));
+            var cart = await _db.Carts.Include(s => s.CartItems).Include(s => s.CartDiscounts).FirstOrDefaultAsync(c => c.Id == Guid.Parse(request.IdCart) && c.Status == "ACTIVE");
             if (cart == null) return new global::CartService.API.Protos.Cart { IdCart = Guid.Empty.ToString() };
             var cartProto = new global::CartService.API.Protos.Cart
             {

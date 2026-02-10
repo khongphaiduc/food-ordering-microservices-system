@@ -17,7 +17,7 @@ namespace order_service.OrderService.Domain.Entities
         public string OptionsSnapshot { get; private set; } = string.Empty;
 
 
-        public OrderItemsEntity(Guid idOrderItems, Guid idOrder, Guid idProduct, string productName, Guid? idVariant, string? variantName, decimal unitPrice, int quantity, decimal totalPrice, string optionsSnapshot)
+        internal OrderItemsEntity(Guid idOrderItems, Guid idOrder, Guid idProduct, string productName, Guid? idVariant, string? variantName, decimal unitPrice, int quantity, decimal totalPrice, string optionsSnapshot)
         {
             IdOrderItems = idOrderItems;
             IdOrder = idOrder;

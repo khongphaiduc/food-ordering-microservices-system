@@ -3,6 +3,7 @@ using order_service.OrderService.Domain.Aggregate;
 using order_service.OrderService.Domain.Interface;
 using order_service.OrderService.Infastructure.Models;
 
+
 namespace order_service.OrderService.Infastructure.Repository
 {
     public class OrderRepository : IOrderRepository
@@ -17,16 +18,19 @@ namespace order_service.OrderService.Infastructure.Repository
         }
 
         #region Create new order 
-        public async Task CreateNewOrder(OrdersAggregate NewOrderAggregate)
+        public async Task<bool> CreateNewOrder(OrdersAggregate NewOrderAggregate)
         {
+            var Transaction = await _db.Database.BeginTransactionAsync();
+
             try
             {
                 _logger.LogInformation("Start Create New Order");
-                var Transaction = await _db.Database.BeginTransactionAsync();
+
 
                 var OrderBase = new Order
                 {
                     Id = NewOrderAggregate.IdOrder,
+                    CartId = NewOrderAggregate.IdCart,
                     CreatedAt = NewOrderAggregate.CreatedAt,
                     DiscountAmount = NewOrderAggregate.Discount.Value,
                     FinalAmount = NewOrderAggregate.FinalAmount.Value,
@@ -35,7 +39,7 @@ namespace order_service.OrderService.Infastructure.Repository
                     Status = NewOrderAggregate.Status.ToString(),
                     TotalAmount = NewOrderAggregate.TotalAmount.Value,
                     OrderCode = $"TPD-{DateTime.Now.Ticks}",
-                    OrderDelivery = new OrderDelivery(),
+
                     UpdatedAt = NewOrderAggregate.UpdatedAt,
                     UserId = NewOrderAggregate.IdCustomer,
                     OrderItems = NewOrderAggregate.OrderItemsEntities.Select(s => new OrderItem
@@ -68,14 +72,17 @@ namespace order_service.OrderService.Infastructure.Repository
                 };
 
                 await _db.Orders.AddAsync(OrderBase);
+
+                _logger.LogInformation("Create New Order Success");
                 await _db.SaveChangesAsync();
                 await Transaction.CommitAsync();
-                _logger.LogInformation("Create New Order Success");
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while creating new order");
                 await _db.Database.RollbackTransactionAsync();
+                return false;
             }
 
         }

@@ -12,8 +12,8 @@ using order_service.OrderService.Infastructure.Models;
 namespace order_service.Migrations
 {
     [DbContext(typeof(FoodOrderContext))]
-    [Migration("20260208134819_v12")]
-    partial class v12
+    [Migration("20260210023439_v3")]
+    partial class v3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,12 +41,15 @@ namespace order_service.Migrations
                     b.Property<decimal>("FinalAmount")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<Guid?>("IdCart")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("OrderCode")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("PaymentProvider")
+                    b.Property<string>("PaymentMethod")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
@@ -93,7 +96,7 @@ namespace order_service.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("PhoneNumer")
+                    b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -157,7 +160,7 @@ namespace order_service.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Value")
+                    b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<DateTime>("CreatedAt")

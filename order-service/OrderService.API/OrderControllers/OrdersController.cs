@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using order_service.OrderService.Appilcation.DTOs;
 using order_service.OrderService.Appilcation.Services;
+using order_service.OrderService.Domain.Enums;
 using order_service.OrderService.Infastructure.Models;
 using System.Threading.Tasks;
 
@@ -27,10 +29,11 @@ namespace order_service.OrderService.API.OrderControllers
             return Ok(s);
         }
 
-        [HttpPost("{Id}")]
-        public async Task<IActionResult> CreateNewOrder([FromRoute] Guid Id)
+        [HttpPost]
+        public async Task<IActionResult> CreateNewOrder([FromBody] RequestPaymentCart request)
         {
-            var result = await _order.Excute(Id);
+            PaymentMethod methodPayment = (PaymentMethod)request.PaymentMethod;
+            var result = await _order.Excute(request.IdCart, methodPayment);
             return Ok(result);
         }
     }

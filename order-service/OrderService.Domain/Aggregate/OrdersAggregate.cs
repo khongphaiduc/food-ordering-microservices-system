@@ -1,6 +1,7 @@
 ﻿using order_service.OrderService.Domain.Entities;
 using order_service.OrderService.Domain.Enums;
 using order_service.OrderService.Domain.OjectValue;
+using order_service.OrderService.Infastructure.ServicesImplements;
 
 namespace order_service.OrderService.Domain.Aggregate
 {
@@ -8,6 +9,8 @@ namespace order_service.OrderService.Domain.Aggregate
     {
         public Guid IdOrder { get; private set; }
         public Guid IdCustomer { get; private set; }
+
+        public Guid IdCart { get; private set; }
 
         public OrderStatus Status { get; private set; }
 
@@ -27,85 +30,67 @@ namespace order_service.OrderService.Domain.Aggregate
         private readonly List<OrderPaymentsEntity> orderPaymentsEntities = new();
         public IReadOnlyList<OrderPaymentsEntity> OrderPaymentsEntities => orderPaymentsEntities.AsReadOnly();
 
-        public OrderDeliveryEntity? Delivery { get; private set; }
-
-        #region Constructors
 
 
-        internal OrdersAggregate(
-            Guid idOrder,
-            Guid idCustomer,
-            OrderStatus status,
-            decimal shippingFee,
-            DiscountValue discount,
-            PaymentMethod paymentMethod,
-            DateTime createdAt
-        )
+
+        public static OrdersAggregate CreateNewOrder(Guid IdCart, Guid IdCustomer, OrderStatus statusOrder, decimal ShippingFee, decimal Discount, PaymentMethod paymentMethod)
+        {
+            return new OrdersAggregate
+            {
+                IdOrder = Guid.NewGuid(),
+                IdCart = IdCart,
+                IdCustomer = IdCustomer,
+                Status = statusOrder,
+                TotalAmount = new Price(0),
+                ShippingFee = ShippingFee,
+                Discount = new DiscountValue(Discount),
+                FinalAmount = new Price(0),
+                PaymentMethod = paymentMethod,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+        }
+
+        public OrdersAggregate(Guid idOrder, Guid idCustomer, Guid idCart, OrderStatus status, Price totalAmount, decimal shippingFee, DiscountValue discount, Price finalAmount, PaymentMethod paymentMethod, DateTime createdAt, DateTime updatedAt, List<OrderItemsEntity> orderItemsEntities, List<OrderPaymentsEntity> orderPaymentsEntities, OrderDeliveryEntity? delivery)
         {
             IdOrder = idOrder;
             IdCustomer = idCustomer;
+            IdCart = idCart;
             Status = status;
-
+            TotalAmount = totalAmount;
             ShippingFee = shippingFee;
             Discount = discount;
+            FinalAmount = finalAmount;
             PaymentMethod = paymentMethod;
-
-            TotalAmount = new Price(0);
-            FinalAmount = new Price(shippingFee - discount.Value);
-
             CreatedAt = createdAt;
-            UpdatedAt = createdAt;
+            UpdatedAt = updatedAt;
+            this.orderItemsEntities = orderItemsEntities;
+            this.orderPaymentsEntities = orderPaymentsEntities;
+
         }
 
-
-        private OrdersAggregate() { }
-
-        #endregion
-
-        #region Factory
-
-        public static OrdersAggregate CreateNewOrders(
-            Guid userId,
-            decimal shippingFee,
-            decimal discount,
-            PaymentMethod paymentMethod
-        )
+        private OrdersAggregate()
         {
-            return new OrdersAggregate(
-                Guid.NewGuid(),
-                userId,
-                OrderStatus.PENDING,
-                shippingFee,
-                new DiscountValue(discount),
-                paymentMethod,
-                DateTime.UtcNow
-            );
         }
-
-        #endregion
 
         #region Business Methods
 
         public void AddOrderItem(OrderItemsEntity orderItem)
         {
-            if (Status != OrderStatus.PENDING)
-                throw new InvalidOperationException("Không thể thêm item khi order không ở trạng thái Pending");
-
+            if (Status != OrderStatus.PENDING) throw new InvalidOperationException("Không thể thêm item khi order không ở trạng thái Pending");
             orderItemsEntities.Add(orderItem);
             RecalculateAmount();
         }
 
         public void AddOrderPayment(OrderPaymentsEntity orderPayment)
         {
-            if (Status == OrderStatus.CANCELLED)
-                throw new InvalidOperationException("Order đã bị hủy, không thể thanh toán");
-
+            if (Status == OrderStatus.CANCELLED) throw new InvalidOperationException("Order đã bị hủy, không thể thanh toán");
             orderPaymentsEntities.Add(orderPayment);
         }
 
         public void SetDelivery(OrderDeliveryEntity delivery)
         {
-            Delivery = delivery;
+
             UpdatedAt = DateTime.UtcNow;
         }
 
@@ -115,11 +100,20 @@ namespace order_service.OrderService.Domain.Aggregate
             UpdatedAt = DateTime.UtcNow;
         }
 
+
+        public void SetDiscount(decimal discount)
+        {
+            if (Status != OrderStatus.PENDING) throw new InvalidOperationException("Không thể cập nhật giảm giá khi order không ở trạng thái Pending");
+            Discount = new DiscountValue(discount);
+            RecalculateAmount();
+        }
+
         #endregion
+
 
         #region Private Helpers
 
-        private void RecalculateAmount()
+        public void RecalculateAmount()
         {
             var total = orderItemsEntities.Sum(i => i.TotalPrice.Value);
 
