@@ -38,15 +38,15 @@ namespace payment_service
             });
 
             builder.Services.AddScoped<ICreateNewPaymentOrder, CreateNewPaymentOrder>();
-            builder.Services.AddScoped<GetInfomationOfOrderBygRPC>();
+
 
 
             builder.Services.AddGrpcClient<OrderInforGrpc.OrderInforGrpcClient>(options =>
             {
                 options.Address = new Uri("https://localhost:7264");
-
             });
 
+            builder.Services.AddScoped<GetInfomationOfOrderBygRPC>();
             var app = builder.Build();
 
             app.UseHttpsRedirection();

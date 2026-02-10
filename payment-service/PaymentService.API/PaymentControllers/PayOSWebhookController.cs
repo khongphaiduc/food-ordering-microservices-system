@@ -5,7 +5,7 @@ using PayOS.Models.Webhooks;
 
 namespace payment_service.PaymentService.API.PaymentControllers
 {
-    [Route("api/payment/payos")]
+    [Route("api/payments")]
     [ApiController]
     public class PayOSWebhookController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace payment_service.PaymentService.API.PaymentControllers
             _payOSClient = payOSClient;
         }
 
-        [HttpPost("webhook")]
+        [HttpPost("payos/webhook")]
         public async Task<IActionResult> WebHookAsync([FromBody] Webhook webhook)
         {
             var webhookData = await _payOSClient.Webhooks.VerifyAsync(webhook);

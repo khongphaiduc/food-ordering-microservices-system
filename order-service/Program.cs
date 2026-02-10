@@ -8,12 +8,13 @@ using order_service.OrderService.Domain.Interface;
 using order_service.OrderService.Infastructure.Models;
 using order_service.OrderService.Infastructure.Repository;
 using order_service.OrderService.Infastructure.ServicesImplements;
+using System.Threading.Tasks;
 
 namespace order_service
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             DotNetEnv.Env.Load();
             var builder = WebApplication.CreateBuilder(args);
@@ -41,7 +42,7 @@ namespace order_service
             builder.Services.AddGrpc();
             var app = builder.Build();
 
-
+            app.MapGrpcService<GetOrderSubServices>();
 
             app.UseHttpsRedirection();
 

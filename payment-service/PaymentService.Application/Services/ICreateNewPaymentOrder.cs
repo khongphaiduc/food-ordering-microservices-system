@@ -2,7 +2,7 @@
 {
     public interface ICreateNewPaymentOrder
     {
-        Task<string> Excute(Guid IdOrder);
+        Task<string> Excute(Guid IdOrder, global::OrderService.API.Proto.ResponseOrderInformation order);
     }
 
 }

@@ -15,12 +15,7 @@ namespace payment_service.PaymentService.API.gRPC
 
         public async Task<OrderDTOInternal> Excute(Guid IdOrder)
         {
-
-
-            var order = await _orderClient.GetInformationOrderAsync(new RequestOrder
-            {
-                OrderID = IdOrder.ToString()
-            });
+            var order = await _orderClient.GetInformationOrderAsync(new RequestOrder { OrderID = IdOrder.ToString() },deadline:DateTime.UtcNow.AddSeconds(4));
 
             if (order.OrderID == Guid.Empty.ToString()) return new OrderDTOInternal { OrderId = Guid.Empty };
             return new OrderDTOInternal
