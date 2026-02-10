@@ -5,7 +5,7 @@ using PayOS.Models.Webhooks;
 
 namespace payment_service.PaymentService.API.PaymentControllers
 {
-    [Route("api/payos")]
+    [Route("api/payment/payos")]
     [ApiController]
     public class PayOSWebhookController : ControllerBase
     {

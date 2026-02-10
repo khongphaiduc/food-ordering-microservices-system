@@ -94,7 +94,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     },
     {
-      "DownstreamPathTemplate": "/api/payment/{everything}",
+      "DownstreamPathTemplate": "/api/payment/payos/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -102,7 +102,7 @@
           "Port": 7251
         }
       ],
-      "UpstreamPathTemplate": "/payment/{everything}",
+      "UpstreamPathTemplate": "/payment/payos/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     }
 
