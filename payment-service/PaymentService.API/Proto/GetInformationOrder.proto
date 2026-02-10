@@ -1,0 +1,22 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "OrderService.API.Proto";
+
+package OrderService;
+
+service OrderInforGrpc {
+  rpc GetInformationOrder (RequestOrder) returns (ResponseOrderInformation);
+}
+
+message RequestOrder {
+	string OrderID = 1;
+}
+
+
+message ResponseOrderInformation {
+	string OrderID = 1;
+	string UserID = 2 ;
+	string OrderCode = 3 ; 
+	int64 FinalAmount = 4 ;
+	string OrderStatus =5 ;
+}

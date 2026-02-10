@@ -10,8 +10,9 @@
 	<ItemGroup>
 		<PackageReference Include="DotNetEnv" Version="3.1.1" />
 		<PackageReference Include="Google.Protobuf" Version="3.33.5" />
-		<PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
+		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.76.0" />
 		<PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
+		<PackageReference Include="Grpc.Net.ClientFactory" Version="2.76.0" />
 		<PackageReference Include="Grpc.Tools" Version="2.78.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -42,5 +43,10 @@
 	<ItemGroup>
 		<Protobuf Include="OrderService.API\Proto\InformationCart.proto" GrpcServices="Client" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="OrderService.API\Proto\GetInformationOrder.proto" GrpcServices="Server" />
+	</ItemGroup>
+
 
 </Project>

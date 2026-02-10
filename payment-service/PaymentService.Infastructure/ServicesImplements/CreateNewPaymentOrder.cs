@@ -1,0 +1,45 @@
+﻿using payment_service.PaymentService.API.gRPC;
+using payment_service.PaymentService.Application.Services;
+using payment_service.PaymentService.Infastructure.Models;
+using PayOS;
+using PayOS.Models.V2.PaymentRequests;
+
+namespace payment_service.PaymentService.Infastructure.ServicesImplements
+{
+    public class CreateNewPaymentOrder : ICreateNewPaymentOrder
+    {
+        private readonly PayOSClient _payOS;
+        private readonly GetInfomationOfOrderBygRPC _getOrder;
+
+        public CreateNewPaymentOrder(GetInfomationOfOrderBygRPC getInfomationOfOrderBygRPC, PayOSClient payOSClient)
+        {
+            _payOS = payOSClient;
+            _getOrder = getInfomationOfOrderBygRPC;
+        }
+
+        public async Task<string> Excute(Guid IdOrder)
+        {
+            var order = await _getOrder.Excute(IdOrder);  // get information of Order through gRPC
+
+            var paymentRequest = new CreatePaymentLinkRequest
+            {
+                OrderCode = long.Parse(DateTime.Now.ToString("yyyyMMddHHmmss")),
+                Amount = (long)order.TotalAmount,
+                Description = order.OrderCode,
+                ReturnUrl = "https://your-url.com",
+                CancelUrl = "https://your-url.com"
+            };
+
+            var paymentLink = await _payOS.PaymentRequests.CreateAsync(paymentRequest);
+
+            if (paymentLink.QrCode != null)
+            {
+                return paymentLink.QrCode;
+            }
+            else
+            {
+                return "Create Payment Fail";
+            }
+        }
+    }
+}

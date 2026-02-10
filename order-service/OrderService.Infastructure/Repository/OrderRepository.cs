@@ -38,7 +38,7 @@ namespace order_service.OrderService.Infastructure.Repository
                     ShippingFee = NewOrderAggregate.ShippingFee,
                     Status = NewOrderAggregate.Status.ToString(),
                     TotalAmount = NewOrderAggregate.TotalAmount.Value,
-                    OrderCode = $"TPD-{DateTime.Now.Ticks}",
+                    OrderCode = long.Parse(DateTime.Now.ToString("yyyyMMddHHmmss")).ToString(),
 
                     UpdatedAt = NewOrderAggregate.UpdatedAt,
                     UserId = NewOrderAggregate.IdCustomer,
