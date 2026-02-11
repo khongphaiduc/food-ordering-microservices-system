@@ -37,7 +37,7 @@ namespace cart_service.CartService.API.CartControllers
             return Ok(result);
         }
 
-        // đã test
+        // tạo cart
         [HttpPost]
         public async Task<IActionResult> TestCreateCart([FromBody] RequestCreateNewCartUser request)
         {
@@ -45,21 +45,7 @@ namespace cart_service.CartService.API.CartControllers
             return Ok(idCart);
         }
 
-
-        // test gprc
-        [HttpPost("products")]
-        public async Task<IActionResult> UpdateCartFood([FromBody] ProductIDInternal request)
-        {
-            var grpcRequest = new ProductRequestList();
-
-            grpcRequest.ProductId.AddRange(
-                request.IdProduct.Select(id => id.ToString())
-            );
-
-            var grpcResponse = await _product.GetProductInfoAsync(grpcRequest);
-            return Ok(grpcResponse);
-        }
-
+        //cập nhật cart
         [HttpPost("update-cart")]
         public async Task<IActionResult> TestAddProductIntoCart([FromBody] RequestUpdateCartFood request)
         {
@@ -67,6 +53,9 @@ namespace cart_service.CartService.API.CartControllers
             return Ok();
         }
 
+
+
+        //xem cart 
         [HttpGet("user-cart/{idUser}")]
         public async Task<IActionResult> GetCartUser([FromRoute] Guid idUser)
         {
