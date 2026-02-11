@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using order_service.OrderService.Appilcation.DTOs;
 using order_service.OrderService.Domain.Aggregate;
 using order_service.OrderService.Domain.Interface;
 using order_service.OrderService.Infastructure.Models;
@@ -18,7 +19,7 @@ namespace order_service.OrderService.Infastructure.Repository
         }
 
         #region Create new order 
-        public async Task<bool> CreateNewOrder(OrdersAggregate NewOrderAggregate)
+        public async Task<ResponseCreateNewOrder> CreateNewOrder(OrdersAggregate NewOrderAggregate)
         {
             var Transaction = await _db.Database.BeginTransactionAsync();
 
@@ -76,13 +77,25 @@ namespace order_service.OrderService.Infastructure.Repository
                 _logger.LogInformation("Create New Order Success");
                 await _db.SaveChangesAsync();
                 await Transaction.CommitAsync();
-                return true;
+                return new ResponseCreateNewOrder
+                {
+                    IdOrder = OrderBase.Id,
+                    OrderCode = OrderBase.OrderCode,
+                    FinalAmount = OrderBase.FinalAmount,
+                    Status = true
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while creating new order");
                 await _db.Database.RollbackTransactionAsync();
-                return false;
+                return new ResponseCreateNewOrder
+                {
+                    IdOrder = Guid.Empty,
+                    Status = false,
+                    FinalAmount = 0,
+                    OrderCode = string.Empty
+                };
             }
 
         }

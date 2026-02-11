@@ -8,6 +8,7 @@ using order_service.OrderService.Domain.Interface;
 using order_service.OrderService.Infastructure.Models;
 using order_service.OrderService.Infastructure.Repository;
 using order_service.OrderService.Infastructure.ServicesImplements;
+using PaymentService.API.Proto;
 using System.Threading.Tasks;
 
 namespace order_service
@@ -31,9 +32,16 @@ namespace order_service
 
             });
 
+            builder.Services.AddGrpcClient<PaymentInforGrpc.PaymentInforGrpcClient>(options =>
+            {
+                options.Address = new Uri("https://localhost:7251");
+
+            });
+
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
             builder.Services.AddScoped<ICreateNewOrder, CreateNewOrder>();
+            builder.Services.AddScoped<IGetListOrderOfUser, GetListOrderOfUser>();
 
             builder.Services.AddScoped<GetInformationOfCart>();
 
@@ -41,8 +49,6 @@ namespace order_service
 
             builder.Services.AddGrpc();
             var app = builder.Build();
-
-            app.MapGrpcService<GetOrderSubServices>();
 
             app.UseHttpsRedirection();
 

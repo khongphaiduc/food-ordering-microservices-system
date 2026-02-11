@@ -1,9 +1,10 @@
-﻿using order_service.OrderService.Domain.Enums;
+﻿using order_service.OrderService.Appilcation.DTOs;
+using order_service.OrderService.Domain.Enums;
 
 namespace order_service.OrderService.Appilcation.Services
 {
     public interface ICreateNewOrder
     {
-        Task<bool> Excute(Guid IdCart,PaymentMethod paymentMethod);
+        Task<string> Excute(Guid IdCart,PaymentMethod paymentMethod);
     }
 }

@@ -41,11 +41,8 @@
 
 
 	<ItemGroup>
+		<Protobuf Include="OrderService.API\Proto\CreatePaymetForOrder.proto" GrpcServices="Client" />
 		<Protobuf Include="OrderService.API\Proto\InformationCart.proto" GrpcServices="Client" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Protobuf Include="OrderService.API\Proto\GetInformationOrder.proto" GrpcServices="Server" />
 	</ItemGroup>
 
 

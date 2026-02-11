@@ -1,9 +1,11 @@
 ﻿using order_service.OrderService.API.gRPC;
+using order_service.OrderService.Appilcation.DTOs;
 using order_service.OrderService.Appilcation.Services;
 using order_service.OrderService.Domain.Aggregate;
 using order_service.OrderService.Domain.Entities;
 using order_service.OrderService.Domain.Enums;
 using order_service.OrderService.Domain.Interface;
+using PaymentService.API.Proto;
 
 namespace order_service.OrderService.Infastructure.ServicesImplements
 {
@@ -11,29 +13,31 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
     {
         private readonly GetInformationOfCart _cartClientGRPC;
         private readonly IOrderRepository _orderRepository;
+        private readonly PaymentInforGrpc.PaymentInforGrpcClient _createPaymentPayOs;
 
-        public CreateNewOrder(GetInformationOfCart getInformationOfCartClient, IOrderRepository orderRepository)
+        public CreateNewOrder(GetInformationOfCart getInformationOfCartClient, IOrderRepository orderRepository, PaymentInforGrpc.PaymentInforGrpcClient paymentInforGrpcClient)
         {
             _cartClientGRPC = getInformationOfCartClient;
             _orderRepository = orderRepository;
+            _createPaymentPayOs = paymentInforGrpcClient;
         }
 
-        public async Task<bool> Excute(Guid IdCart, PaymentMethod paymentMethod)
+        public async Task<string> Excute(Guid IdCart, PaymentMethod paymentMethod)
         {
 
             var cart = await _cartClientGRPC.Excute(IdCart);  // data cart service 
 
-            if (cart.CartId == Guid.Empty) return false;
+            if (cart.CartId == Guid.Empty) return string.Empty;
 
             // order
-            var newCartAggregate = OrdersAggregate.CreateNewOrder(cart.CartId, cart.UserId, cart.Status, 0, 0, paymentMethod);
+            var newOrderAggregate = OrdersAggregate.CreateNewOrder(cart.CartId, cart.UserId, cart.Status, 0, 0, paymentMethod);
 
             // order items
             if (cart.CartItems != null && cart.CartItems.Any())
             {
                 foreach (var item in cart.CartItems)
                 {
-                    newCartAggregate.AddOrderItem(OrderItemsEntity.CreateOrderItems(newCartAggregate.IdOrder, item.ProductId, item.ProductName, item.VariantId, item.VariantName, (decimal)item.UnitPrice, item.Quantity, (decimal)item.TotalPrice));
+                    newOrderAggregate.AddOrderItem(OrderItemsEntity.CreateOrderItems(newOrderAggregate.IdOrder, item.ProductId, item.ProductName, item.VariantId, item.VariantName, (decimal)item.UnitPrice, item.Quantity, (decimal)item.TotalPrice));
                 }
             }
 
@@ -43,20 +47,39 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
             if (cart.CartDiscounts != null && cart.CartDiscounts.Any())
             {
                 DiscountAmount = cart.CartDiscounts.Sum(s => s.DiscountAmount);
-                newCartAggregate.SetDiscount(DiscountAmount);
+                newOrderAggregate.SetDiscount(DiscountAmount);
             }
 
             // payment 
-            newCartAggregate.AddOrderPayment(OrderPaymentsEntity.CreateOrderPayment(newCartAggregate.IdOrder, paymentMethod, PaymentStatus.PENDING, newCartAggregate.FinalAmount.Value, null, null));
+            newOrderAggregate.AddOrderPayment(OrderPaymentsEntity.CreateOrderPayment(newOrderAggregate.IdOrder, paymentMethod, PaymentStatus.PENDING, newOrderAggregate.FinalAmount.Value, null, null));
 
-            var resultCreateNewOrder = await _orderRepository.CreateNewOrder(newCartAggregate);  //   tạo order
+            var resultCreateNewOrder = await _orderRepository.CreateNewOrder(newOrderAggregate);  //   tạo order
 
-            if (resultCreateNewOrder)
+            if (resultCreateNewOrder.Status)
             {
-                return await _cartClientGRPC.ChangeStatusCart(cart.CartId, StatusCart.CHECKED_OUT);  //  change status cart
-            }
-            return false;
+                var resultChangeStatusCart = await _cartClientGRPC.ChangeStatusCart(cart.CartId, StatusCart.CHECKED_OUT);  //  change status cart = Checked out
 
+                if (resultChangeStatusCart == false) return string.Empty;
+
+
+
+                // create url payment 
+                var QRCodeString = await _createPaymentPayOs.CreateNewPaymentAsync(new global::PaymentService.API.Proto.RequestOrderCreatePayment
+                {
+                    OrderId = resultCreateNewOrder.IdOrder.ToString(),
+                    DiscountAmount = 0,
+                    FinalAmount = (double)resultCreateNewOrder.FinalAmount,
+                    OrderCode = resultCreateNewOrder.OrderCode,
+                });
+
+                if (QRCodeString.StatusCreatePayment == "Success")
+                {
+                    return QRCodeString.QRCodeString;
+                }
+            }
+
+
+            return string.Empty;
         }
     }
 }

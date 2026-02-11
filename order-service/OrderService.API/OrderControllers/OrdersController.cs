@@ -14,35 +14,33 @@ namespace order_service.OrderService.API.OrderControllers
     {
         private readonly FoodOrderContext _db;
         private readonly ICreateNewOrder _order;
+        private readonly IGetListOrderOfUser _getListOrder;
 
-        public OrdersController(FoodOrderContext foodOrderContext, ICreateNewOrder createNewOrder)
+        public OrdersController(FoodOrderContext foodOrderContext, ICreateNewOrder createNewOrder, IGetListOrderOfUser getListOrderOfUser)
         {
             _db = foodOrderContext;
             _order = createNewOrder;
+            _getListOrder = getListOrderOfUser;
         }
 
 
-        [HttpGet]
-        public IActionResult test()
-        {
-            var s = _db.Orders.ToList();
-            return Ok(s);
-        }
-
+        // tạo order 
         [HttpPost]
         public async Task<IActionResult> CreateNewOrder([FromBody] RequestPaymentCart request)
         {
             PaymentMethod methodPayment = (PaymentMethod)request.PaymentMethod;
-            var result = await _order.Excute(request.IdCart, methodPayment);
-            return Ok(result);
+            var QRCodeString = await _order.Excute(request.IdCart, methodPayment);
+            return Ok(QRCodeString);
         }
 
-        [HttpPut]
-        public IActionResult CancelCreateNewOrder(RequestCancelCreateNewOrder request)
+
+        // xem danh sách order 
+        [HttpPost("histories")]
+        public async Task<IActionResult> GetListOrders([FromBody] RequestGetListOrderWithPagination request)
         {
-
-
-            return Ok();
+            var orders = await _getListOrder.GetListOrderForUser(request);
+            return Ok(orders);
         }
+
     }
 }

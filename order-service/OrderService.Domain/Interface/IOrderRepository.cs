@@ -1,10 +1,11 @@
-﻿using order_service.OrderService.Domain.Aggregate;
+﻿using order_service.OrderService.Appilcation.DTOs;
+using order_service.OrderService.Domain.Aggregate;
 
 namespace order_service.OrderService.Domain.Interface
 {
     public interface IOrderRepository
     {
-        Task<bool> CreateNewOrder(OrdersAggregate orders);
+        Task<ResponseCreateNewOrder> CreateNewOrder(OrdersAggregate orders);
 
         Task UpdateOrder(OrdersAggregate orders);
 
