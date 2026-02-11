@@ -1,8 +1,10 @@
-﻿namespace payment_service.PaymentService.Application.Services
+﻿using payment_service.PaymentService.Application.DTOs;
+
+namespace payment_service.PaymentService.Application.Services
 {
     public interface ICreateNewPaymentOrder
     {
-        Task<string> Excute(Guid IdOrder, global::OrderService.API.Proto.ResponseOrderInformation order);
+        Task<string> Excute(OrderDTOInternal order);
     }
 
 }

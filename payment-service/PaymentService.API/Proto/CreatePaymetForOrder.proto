@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+option csharp_namespace = "PaymentService.API.Proto";
+package PaymentService;
+service PaymentInforGrpc {
+  rpc CreateNewPayment (RequestOrderCreatePayment) returns (ResponseOrderQRCode);
+}
+message RequestOrderCreatePayment{
+  string OrderId = 1;
+  double FinalAmount = 2;
+  double DiscountAmount = 3 ;
+  string OrderCode = 4;
+  string OrderStatus = 5 ;
+} 
+message ResponseOrderQRCode {
+     string StatusCreatePayment = 1;
+     string QRCodeString = 2;
+}
+
