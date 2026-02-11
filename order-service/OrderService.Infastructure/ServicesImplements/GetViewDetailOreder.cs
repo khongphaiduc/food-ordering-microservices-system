@@ -1,0 +1,48 @@
+﻿using Microsoft.EntityFrameworkCore;
+using order_service.OrderService.Appilcation.DTOs;
+using order_service.OrderService.Appilcation.Services;
+using order_service.OrderService.Domain.Enums;
+using order_service.OrderService.Infastructure.Models;
+
+namespace order_service.OrderService.Infastructure.ServicesImplements
+{
+    public class GetViewDetailOreder : IGetViewDetailOreder
+    {
+        private readonly FoodOrderContext _db;
+
+        public GetViewDetailOreder(FoodOrderContext foodOrderContext)
+        {
+            _db = foodOrderContext;
+        }
+
+        public async Task<ResponseViewDetailOrderDTO> Excute(RequestViewOrderDetail request)
+        {
+            var order = await _db.Orders.Include(s => s.OrderItems).FirstOrDefaultAsync(s => s.Id == request.IdOrder && s.UserId == request.IdUser);
+
+            if (order == null) return new ResponseViewDetailOrderDTO();
+
+            var s = new ResponseViewDetailOrderDTO
+            {
+                OrderStatus = Enum.Parse<OrderStatus>(order.Status),
+                ShippingFee = order.ShippingFee,
+                TotalPrice = order.TotalAmount,
+                DiscountAmount = order.DiscountAmount,
+                PaymentMethod = Enum.Parse<PaymentMethod>(order.PaymentMethod!),
+                CreateAt =  order.CreatedAt,
+                OrderItems = order.OrderItems.Select(oi => new ResponseViewDetailOrderItemDTO
+                {
+                    ProductName = oi.ProductName,
+                    Variantname = oi.VariantName ?? "Lỗi hiển thị",
+                    Price = oi.Price,
+                    Quantity = oi.Quantity,
+                    TotalPrice = oi.TotalPrice
+                }).ToList(),
+
+            };
+
+            Console.WriteLine();
+
+            return s;
+        }
+    }
+}

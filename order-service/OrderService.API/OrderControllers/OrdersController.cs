@@ -15,12 +15,14 @@ namespace order_service.OrderService.API.OrderControllers
         private readonly FoodOrderContext _db;
         private readonly ICreateNewOrder _order;
         private readonly IGetListOrderOfUser _getListOrder;
+        private readonly IGetViewDetailOreder _viewDetailOrder;
 
-        public OrdersController(FoodOrderContext foodOrderContext, ICreateNewOrder createNewOrder, IGetListOrderOfUser getListOrderOfUser)
+        public OrdersController(FoodOrderContext foodOrderContext, ICreateNewOrder createNewOrder, IGetListOrderOfUser getListOrderOfUser, IGetViewDetailOreder getViewDetailOreder)
         {
             _db = foodOrderContext;
             _order = createNewOrder;
             _getListOrder = getListOrderOfUser;
+            _viewDetailOrder = getViewDetailOreder;
         }
 
 
@@ -41,6 +43,16 @@ namespace order_service.OrderService.API.OrderControllers
             var orders = await _getListOrder.GetListOrderForUser(request);
             return Ok(orders);
         }
+
+        [HttpPost("detail")]
+        public async Task<IActionResult> Index([FromBody] RequestViewOrderDetail request)
+        {
+
+            var orderDetail = await _viewDetailOrder.Excute(request);
+
+            return Ok(orderDetail);
+        }
+
 
     }
 }

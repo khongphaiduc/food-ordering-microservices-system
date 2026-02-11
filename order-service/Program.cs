@@ -42,7 +42,7 @@ namespace order_service
 
             builder.Services.AddScoped<ICreateNewOrder, CreateNewOrder>();
             builder.Services.AddScoped<IGetListOrderOfUser, GetListOrderOfUser>();
-
+            builder.Services.AddScoped<IGetViewDetailOreder, GetViewDetailOreder>();
             builder.Services.AddScoped<GetInformationOfCart>();
 
             builder.Services.AddControllers();

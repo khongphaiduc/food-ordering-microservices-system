@@ -37,9 +37,6 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
       })
       .ToListAsync();
 
-
-
-
             return new OrderHistoryPagination
             {
                 orderHistory = order,
