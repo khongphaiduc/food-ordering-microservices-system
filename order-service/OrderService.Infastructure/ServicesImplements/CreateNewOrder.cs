@@ -64,6 +64,11 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
                 if (resultChangeStatusCart == false) return string.Empty;
 
 
+                // thanh toán tiền mặt
+                if (paymentMethod != PaymentMethod.PayOS)
+                {
+                    return "Success";
+                }
 
                 // create url payment 
                 var QRCodeString = await _createPaymentPayOs.CreateNewPaymentAsync(new global::PaymentService.API.Proto.RequestOrderCreatePayment
