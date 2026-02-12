@@ -1,5 +1,6 @@
 ﻿using food_service.ProductService.Application.DTOs.Request;
 using food_service.ProductService.Application.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -9,6 +10,7 @@ namespace food_service.ProductService.API.Controllers
 {
     //[EnableRateLimiting("rateFix")]
     [Route("api/products")]
+    //[Authorize(AuthenticationSchemes = "AccessToken")]
     [ApiController]
     public class ProductsController : ControllerBase
     {

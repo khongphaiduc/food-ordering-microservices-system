@@ -36,7 +36,8 @@ namespace order_service.OrderService.API.gRPC
             return resultAfterUpdate > 0 ? new ResponseOrderUpdateStatus
             {
                 MessageUpdate = "Order status updated to PAID successfully",
-                StatusUpdateOrder = true
+                StatusUpdateOrder = true,
+                UserID = Order.UserId.ToString()
             } : new ResponseOrderUpdateStatus
             {
                 MessageUpdate = "Failed to update order status",

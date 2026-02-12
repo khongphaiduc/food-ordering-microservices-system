@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using order_service.OrderService.Appilcation.DTOs;
 using order_service.OrderService.Appilcation.Services;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 namespace order_service.OrderService.API.OrderControllers
 {
     [Route("api/orders")]
+    [Authorize(AuthenticationSchemes = "AccessToken")]
     [ApiController]
     public class OrdersController : ControllerBase
     {

@@ -27,7 +27,7 @@ namespace payment_service.PaymentService.Infastructure.ServicesImplements
             {
                 OrderCode = long.Parse(DateTime.Now.ToString("yyyyMMddHHmmss")),
                 Amount = (long)order.TotalAmount,
-                Description = order.OrderCode,
+                Description = "2HONDAICODON",
                 ReturnUrl = "https://your-url.com",
                 CancelUrl = "https://your-url.com"
             };

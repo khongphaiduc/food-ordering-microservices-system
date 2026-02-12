@@ -1,7 +1,9 @@
 
 
 using CartService.API.Protos;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using order_service.OrderService.API.gRPC;
 using order_service.OrderService.Appilcation.Services;
 using order_service.OrderService.Domain.Interface;
@@ -24,6 +26,24 @@ namespace order_service
             {
                 options.UseSqlServer(builder.Configuration["URLORDER"]);
             });
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+        .AddJwtBearer("AccessToken", option =>
+        {
+            option.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key:AccessToken"]!))
+            };
+        });
 
 
             builder.Services.AddGrpcClient<CartInforGrpc.CartInforGrpcClient>(options =>

@@ -15,5 +15,6 @@ message RequestOrderUpdateStatus{
 message ResponseOrderUpdateStatus {
   bool StatusUpdateOrder = 1 ;
   string messageUpdate = 2;
+   string UserID = 3;
 }
 

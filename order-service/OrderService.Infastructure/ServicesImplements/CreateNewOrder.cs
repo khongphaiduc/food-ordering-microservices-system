@@ -14,12 +14,14 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
         private readonly GetInformationOfCart _cartClientGRPC;
         private readonly IOrderRepository _orderRepository;
         private readonly PaymentInforGrpc.PaymentInforGrpcClient _createPaymentPayOs;
+        private readonly ILogger<CreateNewOrder> _logger;
 
-        public CreateNewOrder(GetInformationOfCart getInformationOfCartClient, IOrderRepository orderRepository, PaymentInforGrpc.PaymentInforGrpcClient paymentInforGrpcClient)
+        public CreateNewOrder(GetInformationOfCart getInformationOfCartClient, IOrderRepository orderRepository, PaymentInforGrpc.PaymentInforGrpcClient paymentInforGrpcClient, ILogger<CreateNewOrder> logger)
         {
             _cartClientGRPC = getInformationOfCartClient;
             _orderRepository = orderRepository;
             _createPaymentPayOs = paymentInforGrpcClient;
+            _logger = logger;
         }
 
         public async Task<string> Excute(Guid IdCart, PaymentMethod paymentMethod)

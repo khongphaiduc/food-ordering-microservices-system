@@ -1,6 +1,8 @@
 ﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using search_service.Models;
 using search_service.SearchService.API.Middlware;
 using search_service.SearchService.Application.Interface;
@@ -24,6 +26,24 @@ namespace search_service
             {
                 options.UseNpgsql(builder.Configuration["SQLPRODUCT"]);
             });
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer("AccessToken", option =>
+             {
+                 option.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateIssuer = true,
+                     ValidateAudience = true,
+                     ValidateLifetime = true,
+                     ValidateIssuerSigningKey = true,
+                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                     ValidAudience = builder.Configuration["Jwt:Audience"],
+                     IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key:AccessToken"]!))
+                 };
+             });
 
 
             builder.Services.AddStackExchangeRedisCache(options =>          // AddStackExchangeRedisCache sẽ map IDistributeCatche

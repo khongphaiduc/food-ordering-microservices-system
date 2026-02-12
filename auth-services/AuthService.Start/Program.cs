@@ -73,7 +73,7 @@ namespace auth_services.AuthService.Start
             });
 
 
-            // gRPC
+
             builder.Services.AddGrpcClient<UserInfoGrpc.UserInfoGrpcClient>(s =>
             {
                 s.Address = new Uri("https://localhost:7199");
@@ -81,7 +81,7 @@ namespace auth_services.AuthService.Start
 
 
 
-            builder.Services.AddHttpContextAccessor();   // cung cấp httcontext trong service
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddScoped<IGenarateSalt, GenarateSalt>();
             builder.Services.AddScoped<IHashPassword, HashPassword>();

@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using notification_service.Models;
 using notification_service.Notification.Application.Services;
 using notification_service.Notification.Domain.Interface;
@@ -22,6 +24,24 @@ namespace notification_service.Notificaiton.Start
                 options.UseNpgsql(builder.Configuration["URLSQL_NOTIFICATIONS"]);
 
             });
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer("AccessToken", option =>
+             {
+            option.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key:AccessToken"]!))
+            };
+             });
 
 
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();

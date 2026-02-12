@@ -1,5 +1,6 @@
 ﻿using food_service.ProductService.Application.DTOs.Request;
 using food_service.ProductService.Application.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 namespace food_service.ProductService.API.Controllers
 {
     [Route("api/admin")]
+    [Authorize(AuthenticationSchemes = "AccessToken")]
     [ApiController]
     public class AdminManagementController : ControllerBase
     {

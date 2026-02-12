@@ -5,7 +5,9 @@ using cart_service.CartService.Infastructure.ImplementServices;
 using cart_service.CartService.Infastructure.Mapper;
 using cart_service.CartService.Infastructure.Models;
 using cart_service.CartService.Infastructure.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using productService.API.Protos;
 
 namespace cart_service
@@ -22,6 +24,24 @@ namespace cart_service
                 options.UseNpgsql(builder.Configuration["URLCARTSQL"]);
             });
 
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+           .AddJwtBearer("AccessToken", option =>  
+           {
+               option.TokenValidationParameters = new TokenValidationParameters
+               {
+                   ValidateIssuer = true,
+                   ValidateAudience = true,
+                   ValidateLifetime = true,
+                   ValidateIssuerSigningKey = true,
+                   ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                   ValidAudience = builder.Configuration["Jwt:Audience"],
+                   IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key:AccessToken"]!))
+               };
+           });
 
             builder.Services.AddScoped<IMapModel, MapModel>();
             builder.Services.AddScoped<ICartRepository, CartRepository>();

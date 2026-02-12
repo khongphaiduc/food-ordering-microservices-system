@@ -2,6 +2,7 @@
 using cart_service.CartService.Application.DTOs;
 using cart_service.CartService.Application.Services;
 using cart_service.CartService.Infastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using productService.API.Protos;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 namespace cart_service.CartService.API.CartControllers
 {
     [Route("api/cart")]
+    [Authorize(AuthenticationSchemes = "AccessToken")]
     [ApiController]
     public class FoodCartController : ControllerBase
     {
