@@ -43,7 +43,8 @@
 	<ItemGroup>
 		<Protobuf Include="OrderService.API\Proto\CreatePaymetForOrder.proto" GrpcServices="Client" />
 		<Protobuf Include="OrderService.API\Proto\InformationCart.proto" GrpcServices="Client" />
+		<Protobuf Include="OrderService.API\Proto\UpdateStatusOrderPaid.proto" GrpcServices="Server" />
 	</ItemGroup>
-
+	
 
 </Project>

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OrderService.API.Proto;
 using payment_service.PaymentService.API.gRPC;
 using payment_service.PaymentService.Application.Services;
 using payment_service.PaymentService.Infastructure.Models;
@@ -36,8 +37,16 @@ namespace payment_service
                 });
             });
 
+            builder.Services.AddGrpcClient<OrderServiceUpdateStatusGrpc.OrderServiceUpdateStatusGrpcClient>(options =>
+            {
+                options.Address = new Uri("https://localhost:7264");
+
+            });
+
             builder.Services.AddScoped<ICreateNewPaymentOrder, CreateNewPaymentOrder>(); 
-            
+            builder.Services.AddScoped<IUpdateOrderStatus, UpdateOrderStatus>();
+
+
             builder.Services.AddGrpc();
             var app = builder.Build();
 

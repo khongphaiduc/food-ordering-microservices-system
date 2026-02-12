@@ -1,0 +1,19 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "OrderService.API.Proto";
+
+package OrdertService;
+
+service OrderServiceUpdateStatusGrpc {
+  rpc UpdateStatusOrder (RequestOrderUpdateStatus) returns (ResponseOrderUpdateStatus);
+}
+
+message RequestOrderUpdateStatus{
+  string OrderCode = 1;
+} 
+
+message ResponseOrderUpdateStatus {
+  bool StatusUpdateOrder = 1 ;
+  string messageUpdate = 2;
+}
+

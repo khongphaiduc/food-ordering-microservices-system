@@ -12,14 +12,14 @@ namespace order_service.OrderService.API.OrderControllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly FoodOrderContext _db;
+
         private readonly ICreateNewOrder _order;
         private readonly IGetListOrderOfUser _getListOrder;
         private readonly IGetViewDetailOreder _viewDetailOrder;
 
-        public OrdersController(FoodOrderContext foodOrderContext, ICreateNewOrder createNewOrder, IGetListOrderOfUser getListOrderOfUser, IGetViewDetailOreder getViewDetailOreder)
+        public OrdersController(ICreateNewOrder createNewOrder, IGetListOrderOfUser getListOrderOfUser, IGetViewDetailOreder getViewDetailOreder)
         {
-            _db = foodOrderContext;
+
             _order = createNewOrder;
             _getListOrder = getListOrderOfUser;
             _viewDetailOrder = getViewDetailOreder;

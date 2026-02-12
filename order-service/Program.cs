@@ -50,6 +50,8 @@ namespace order_service
             builder.Services.AddGrpc();
             var app = builder.Build();
 
+            app.MapGrpcService<UpdateStatusOrderService>();
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
