@@ -49,8 +49,8 @@ namespace user_service.userservice.start
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserProfile, UserProfile>();
             builder.Services.AddHostedService<UserInfoConsumer>();
-
-
+            builder.Services.AddScoped<IGetInformationUser, GetInformationUser>();
+            builder.Services.AddScoped<ICreateNewAddressForUser, CreateNewAddressForUser>();
             builder.Services.AddControllers();
             builder.Services.AddGrpc();// 1. Add gRPC
 

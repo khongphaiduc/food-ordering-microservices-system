@@ -10,6 +10,6 @@ namespace user_service.UserService.Domain.Interfaces
 
         Task<bool> IsEmailExistsAsync(string email);
 
-        Task<UserAggregate> GetUserAggregatebyId(Guid id);
+     
     }
 }

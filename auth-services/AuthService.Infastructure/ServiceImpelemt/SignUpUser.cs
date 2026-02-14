@@ -47,10 +47,10 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
 
             var salt = _iGenarateSalt.GenarateSalt();
             var hashedPassword = _iHashPassword.HandleHashPassword(user.Password, salt);
-            // aggregate root
+         
             var userAggregate = UserAggregate.CreateNewUser(new FullNameOfUser(user.UserName), new Email(user.Email), hashedPassword, salt);
 
-            // call gRPC user Client
+           
             for (int i = 0; i < 3; i++)
             {
 
@@ -61,7 +61,7 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
                         Id = userAggregate.Id.ToString(),
                         Name = userAggregate.Username.Value,
                         Email = userAggregate.Email.EmailAdress,
-                        Phone = "0000000000"            // phone mặc dịnhd
+                        Phone = "0000000000"           
                     });
 
                     if (resultCallUserClient.IsSuccess)
@@ -74,9 +74,9 @@ namespace auth_services.AuthService.Infastructure.ServiceImpelemt
 
                     if (i == 2)
                     {
-                        throw;  // sau 3 lần retry vẫn lỗi thì ném exception ra ngoài
+                        throw;  
                     }
-                    await Task.Delay(200);    // ngăn giữa các lần retry
+                    await Task.Delay(200);  
                 }
 
             }

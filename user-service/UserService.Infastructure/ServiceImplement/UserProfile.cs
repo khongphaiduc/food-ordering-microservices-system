@@ -37,7 +37,7 @@ namespace user_service.UserService.Infastructure.ServiceImplement
             if (user == null)
             {
                 _logger.LogInformation($"Writing information user {requestUserProfile.FullName} is Successful");
-                var newUser = UserAggregate.CreateNewUser(requestUserProfile.FullName, new Email(requestUserProfile.Email), new PhoneNumber(requestUserProfile.PhoneNumber));
+                var newUser = UserAggregate.CreateNewUser(requestUserProfile.Id, requestUserProfile.FullName, new Email(requestUserProfile.Email), new PhoneNumber(requestUserProfile.PhoneNumber));
                 return await _iUserRepositoty.AddNewUserAsync(newUser);
             }
             else

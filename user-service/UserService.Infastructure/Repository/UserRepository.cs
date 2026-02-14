@@ -47,32 +47,6 @@ namespace user_service.UserService.Infastructure.Repository
             return await _db.SaveChangesAsync() > 0;
         }
 
-        // lấy thông tin user và map sang UserAggregate
-        public async Task<UserAggregate> GetUserAggregatebyId(Guid id)
-        {
-            var user = await _db.Users.Include(s => s.UserAddresses).FirstOrDefaultAsync(u => u.Id == id);
-            return UserAggregate.Rehydrate(
-                user!.Id,
-                user.FullName!,
-                new Domain.ValueObjects.Email(user.Email!),
-                new Domain.ValueObjects.PhoneNumber(user.PhoneNumber!),
-                user.IsActive,
-                user.CreatedAt,
-                user.UpdatedAt,
-                user.UserAddresses.Select(address => UserAddresses.Rehydrate(
-                    address.Id,
-                    address.UserId,
-                    address.AddressLine1!,
-                    address.AddressLine2!,
-                    address.City!,
-                    address.District!,
-                    address.PostalCode!,
-                    address.IsDefault,
-                    address.CreatedAt,
-                    address.UpdatedAt
-                )).ToList()
-            );
-        }
 
         public async Task<bool> IsEmailExistsAsync(string email)
         {
@@ -80,7 +54,7 @@ namespace user_service.UserService.Infastructure.Repository
             return user != null;
         }
 
-        // cập nhật các thong tin cơ bản của user và địa chỉ
+
         public async Task<bool> UpdateUserAsync(UserAggregate userAggregate)
         {
             var user = await _db.Users.Include(s => s.UserAddresses).FirstOrDefaultAsync(u => u.Id == userAggregate.Id);
@@ -97,11 +71,13 @@ namespace user_service.UserService.Infastructure.Repository
             user.IsActive = userAggregate.IsActive;
             user.UpdatedAt = userAggregate.UpdatedAt;
 
+            var IdAddRess = user.UserAddresses.Select(s => s.Id).ToHashSet();
+
             foreach (var item in userAggregate.UserAddresses)
             {
-                if (!user.UserAddresses.Any(s => s.Id == item.Id))
+                if (!IdAddRess.Contains(item.Id))  // thêm
                 {
-                    user.UserAddresses.Add(new UserAddress()
+                    _db.UserAddresses.Add(new UserAddress()
                     {
                         Id = item.Id,
                         UserId = userAggregate.Id,
@@ -117,7 +93,7 @@ namespace user_service.UserService.Infastructure.Repository
                 }
                 else
                 {
-                    var add = user.UserAddresses.FirstOrDefault(s => s.Id == item.Id);
+                    var add = user.UserAddresses.FirstOrDefault(s => s.Id == item.Id);  // update 
                     if (add != null)
                     {
                         add.AddressLine1 = item.AddressLine1;

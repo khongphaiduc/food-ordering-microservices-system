@@ -26,24 +26,6 @@
         {
         }
 
-
-        public static UserAddresses Rehydrate(Guid id, Guid idUser, string addressLine1, string? addressLine2, string city, string district, string postalCode, bool isDefault, DateTime createdAt, DateTime updatedAt)
-        {
-            return new UserAddresses
-            {
-                Id = id,
-                IdUser = idUser,
-                AddressLine1 = addressLine1,
-                AddressLine2 = addressLine2,
-                City = city,
-                District = district,
-                PostalCode = postalCode,
-                IsDefault = isDefault,
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt
-            };
-        }
-
         public static UserAddresses CreateNewAddress(Guid idUser, string addressLine1, string? addressLine2, string city, string district, string postalCode, bool isDefault)
         {
             return new UserAddresses
@@ -61,7 +43,20 @@
             };
         }
 
-        // thay đổi địa chỉ chính
+        internal UserAddresses(Guid id, Guid idUser, string addressLine1, string? addressLine2, string city, string district, string postalCode, bool isDefault, DateTime createdAt, DateTime updatedAt)
+        {
+            Id = id;
+            IdUser = idUser;
+            AddressLine1 = addressLine1;
+            AddressLine2 = addressLine2;
+            City = city;
+            District = district;
+            PostalCode = postalCode;
+            IsDefault = isDefault;
+            CreatedAt = createdAt;
+            UpdatedAt = updatedAt;
+        }
+
         public void ChangeDefaultStatus(bool isDefault)
         {
             IsDefault = isDefault;

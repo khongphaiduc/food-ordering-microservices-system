@@ -70,6 +70,7 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
                     return "Success";
                 }
 
+
                 // create url payment 
                 var QRCodeString = await _createPaymentPayOs.CreateNewPaymentAsync(new global::PaymentService.API.Proto.RequestOrderCreatePayment
                 {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -8,16 +9,20 @@ using user_service.UserService.Application.Services;
 namespace user_service.UserService.API.UserServiceControllers
 {
     [Route("api/users")]
+    [Authorize]
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly ICreateNewAddressForUser _addAddress;
         private readonly IUserProfile _iUserCreateProfileService;
+        private readonly IGetInformationUser _infor;
 
-        public UsersController(IUserProfile userProfile)
+        public UsersController(IUserProfile userProfile, IGetInformationUser getInformationUser, ICreateNewAddressForUser createNewAddressForUser)
         {
+            _addAddress = createNewAddressForUser;
             _iUserCreateProfileService = userProfile;
+            _infor = getInformationUser;
         }
-
 
         [HttpPost]
         public async Task<IActionResult> CreateNewUser(RequestUserProfile requestUserProfile)
@@ -27,27 +32,20 @@ namespace user_service.UserService.API.UserServiceControllers
             return Ok(result);
         }
 
-
-        [HttpGet]
-        public IActionResult Test()
+        [HttpGet("{IdUser}")]
+        public async Task<IActionResult> GetInformationUser([FromRoute] Guid IdUser)
         {
-            var activity = Activity.Current;
-
-            Console.WriteLine(">>> HIT CONTROLLER");
-
-            if (activity == null)
-            {
-                Console.WriteLine("❌ Activity is NULL");
-            }
-            else
-            {
-                Console.WriteLine($"✅ TraceId: {activity.TraceId}");
-                Console.WriteLine($"✅ SpanId : {activity.SpanId}");
-                Console.WriteLine($"✅ Parent : {activity.ParentSpanId}");
-                Console.WriteLine($"✅ Name   : {activity.DisplayName}");
-            }
-
-            return Ok("Xin chào");
+            var infor = await _infor.Excute(IdUser);
+            return Ok(infor);
         }
+
+
+        [HttpPost("address")]
+        public async Task<IActionResult> AddAddress([FromBody] RequestCreateNewAddressUser request)
+        {
+            await _addAddress.Excute(request);
+            return Ok();
+        }
+
     }
 }

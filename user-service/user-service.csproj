@@ -42,7 +42,6 @@
 	</ItemGroup>
 	
   <ItemGroup>
-    <Folder Include="UserService.API\Middlwares\" />
     <Folder Include="UserService.Application\Interfaces\" />
   </ItemGroup>
 

@@ -26,31 +26,11 @@ namespace user_service.UserService.Domain.Aggregates
 
         }
 
-        // Rehydrate method to reconstruct the aggregate from stored data
-        public static UserAggregate Rehydrate(Guid id, string username, Email email, PhoneNumber phoneNumber, bool isActive, DateTime createdAt, DateTime updatedAt, List<UserAddresses> userAddresses)
-        {
-            var aggregate = new UserAggregate
-            {
-                Id = id,
-                Username = username,
-                Email = email,
-                PhoneNumberUser = phoneNumber,
-                IsActive = isActive,
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt,
-                _userAddressesStore = userAddresses
-            };
-            return aggregate;
-        }
-
-
-
-
-        public static UserAggregate CreateNewUser(string username, Email email, PhoneNumber phoneNumber)
+        public static UserAggregate CreateNewUser(Guid IdUser, string username, Email email, PhoneNumber phoneNumber)
         {
             return new UserAggregate
             {
-                Id = Guid.NewGuid(),
+                Id = IdUser,
                 Username = username,
                 Email = email,
                 PhoneNumberUser = phoneNumber,
@@ -59,6 +39,19 @@ namespace user_service.UserService.Domain.Aggregates
                 UpdatedAt = DateTime.UtcNow
             };
         }
+
+        public UserAggregate(Guid id, string? username, Email email, PhoneNumber phoneNumberUser, bool isActive, DateTime createdAt, DateTime updatedAt, List<UserAddresses> userAddressesStore)
+        {
+            Id = id;
+            Username = username;
+            Email = email;
+            PhoneNumberUser = phoneNumberUser;
+            IsActive = isActive;
+            CreatedAt = createdAt;
+            UpdatedAt = updatedAt;
+            _userAddressesStore = userAddressesStore;
+        }
+
 
         public void AddNewAddress(UserAddresses userAddresses)
         {
