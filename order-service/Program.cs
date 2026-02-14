@@ -12,6 +12,7 @@ using order_service.OrderService.Infastructure.Repository;
 using order_service.OrderService.Infastructure.ServicesImplements;
 using PaymentService.API.Proto;
 using System.Threading.Tasks;
+using UserService.API.Protos;
 
 namespace order_service
 {
@@ -58,13 +59,21 @@ namespace order_service
 
             });
 
+
+            builder.Services.AddGrpcClient<UserAddressInfoGrpc.UserAddressInfoGrpcClient>(options =>
+            {
+                options.Address = new Uri("https://localhost:7199");
+
+            });
+
+
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
             builder.Services.AddScoped<ICreateNewOrder, CreateNewOrder>();
             builder.Services.AddScoped<IGetListOrderOfUser, GetListOrderOfUser>();
             builder.Services.AddScoped<IGetViewDetailOreder, GetViewDetailOreder>();
             builder.Services.AddScoped<GetInformationOfCart>();
-
+            builder.Services.AddScoped<GetAddressUserServiceSideClient>();
             builder.Services.AddControllers();
 
             builder.Services.AddGrpc();

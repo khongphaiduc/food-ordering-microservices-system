@@ -33,7 +33,7 @@ namespace order_service.OrderService.API.OrderControllers
         public async Task<IActionResult> CreateNewOrder([FromBody] RequestPaymentCart request)
         {
             PaymentMethod methodPayment = (PaymentMethod)request.PaymentMethod;
-            var QRCodeString = await _order.Excute(request.IdCart, methodPayment);
+            var QRCodeString = await _order.Excute(request.IdCart, methodPayment, request.IdAddress);
             return Ok(QRCodeString);
         }
 

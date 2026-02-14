@@ -39,9 +39,10 @@
 
 	<ItemGroup>
 		<Protobuf Include="UserService.API\Proto\user_info_service.proto" GrpcServices="Server" />
+		<Protobuf Include="UserService.API\Proto\GetAddress.proto" GrpcServices="Server" />
 	</ItemGroup>
 	
-  <ItemGroup>
+	<ItemGroup>
     <Folder Include="UserService.Application\Interfaces\" />
   </ItemGroup>
 

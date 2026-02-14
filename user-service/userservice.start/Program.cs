@@ -73,14 +73,14 @@ namespace user_service.userservice.start
 
             var app = builder.Build();
 
-            app.MapGrpcService<UserInfoSerivce>();// 2. Map gRPC service
+            app.MapGrpcService<UserInfoSerivce>();
+            app.MapGrpcService<AddressUserService>();
 
-
-            app.MapGet("/", () => "gRPC Server running");// endpoint
+            app.MapGet("/", () => "gRPC Server running");
 
             app.UseRouting();
 
-            //app.UseHttpsRedirection();
+          
             app.UseAuthentication();
             app.UseAuthorization();
 

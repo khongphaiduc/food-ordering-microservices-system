@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "UserService.API.Protos";
+
+package userservice;
+
+service UserAddressInfoGrpc {
+  rpc GetAddRessUser ( AddressformationUserRequest)  returns (AddressInformationUserResponse);
+     
+}
+
+message AddressformationUserRequest {
+     string IdAddress = 1 ;
+}
+
+message AddressInformationUserResponse {
+    string NameUser = 1 ;
+    string Phone = 2 ;
+    string Address = 3 ; 
+    string Note = 4 ; 
+}

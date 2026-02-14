@@ -44,5 +44,14 @@ namespace order_service.OrderService.Domain.Entities
             };
         }
 
+        public OrderDeliveryEntity(Guid orderID, string reciverName, Phone phoneNumer, Address address, string note, DateTime estimatedTime)
+        {
+            OrderID = orderID;
+            ReciverName = reciverName;
+            PhoneNumer = phoneNumer;
+            Address = address;
+            Note = note;
+            EstimatedTime = estimatedTime;
+        }
     }
 }

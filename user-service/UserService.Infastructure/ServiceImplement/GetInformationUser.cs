@@ -31,6 +31,7 @@ namespace user_service.UserService.Infastructure.ServiceImplement
 
                 addressUsers = user.UserAddresses.Select(s => new AddressUser
                 {
+                    IdAddressItem = s.Id,
                     City = s.City,
                     Line1 = s.AddressLine1,
                     Line2 = s.AddressLine2,

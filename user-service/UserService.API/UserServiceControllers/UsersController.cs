@@ -9,7 +9,7 @@ using user_service.UserService.Application.Services;
 namespace user_service.UserService.API.UserServiceControllers
 {
     [Route("api/users")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class UsersController : ControllerBase
     {

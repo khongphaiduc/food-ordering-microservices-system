@@ -5,5 +5,7 @@
         public Guid IdCart { get; set; }
 
         public int PaymentMethod { get; set; }
+
+        public Guid IdAddress { get; set; }
     }
 }

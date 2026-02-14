@@ -8,6 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="OrderService.API\Proto\GetAddress.proto" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="DotNetEnv" Version="3.1.1" />
 		<PackageReference Include="Google.Protobuf" Version="3.33.5" />
 		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.76.0" />
@@ -44,7 +48,8 @@
 		<Protobuf Include="OrderService.API\Proto\CreatePaymetForOrder.proto" GrpcServices="Client" />
 		<Protobuf Include="OrderService.API\Proto\InformationCart.proto" GrpcServices="Client" />
 		<Protobuf Include="OrderService.API\Proto\UpdateStatusOrderPaid.proto" GrpcServices="Server" />
+
+		<Protobuf Include="OrderService.API\Proto\GetAddress.proto" GrpcServices="Client" />
 	</ItemGroup>
-	
 
 </Project>

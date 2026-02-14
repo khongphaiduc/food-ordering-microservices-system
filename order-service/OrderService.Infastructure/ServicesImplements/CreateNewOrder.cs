@@ -15,21 +15,27 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
         private readonly IOrderRepository _orderRepository;
         private readonly PaymentInforGrpc.PaymentInforGrpcClient _createPaymentPayOs;
         private readonly ILogger<CreateNewOrder> _logger;
+        private readonly GetAddressUserServiceSideClient _AddressUser;
 
-        public CreateNewOrder(GetInformationOfCart getInformationOfCartClient, IOrderRepository orderRepository, PaymentInforGrpc.PaymentInforGrpcClient paymentInforGrpcClient, ILogger<CreateNewOrder> logger)
+        public CreateNewOrder(GetAddressUserServiceSideClient getAddressUserServiceSideClient, GetInformationOfCart getInformationOfCartClient, IOrderRepository orderRepository, PaymentInforGrpc.PaymentInforGrpcClient paymentInforGrpcClient, ILogger<CreateNewOrder> logger)
         {
             _cartClientGRPC = getInformationOfCartClient;
             _orderRepository = orderRepository;
             _createPaymentPayOs = paymentInforGrpcClient;
             _logger = logger;
+            _AddressUser = getAddressUserServiceSideClient;
         }
 
-        public async Task<string> Excute(Guid IdCart, PaymentMethod paymentMethod)
+        public async Task<string> Excute(Guid IdCart, PaymentMethod paymentMethod, Guid IdAddress)
         {
-
+            // yet retry
             var cart = await _cartClientGRPC.Excute(IdCart);  // data cart service 
 
             if (cart.CartId == Guid.Empty) return string.Empty;
+
+
+            // yet retry
+            var AddressUser = await _AddressUser.GetAddressUserAsync(new UserService.API.Protos.AddressformationUserRequest { IdAddress = IdAddress.ToString() });
 
             // order
             var newOrderAggregate = OrdersAggregate.CreateNewOrder(cart.CartId, cart.UserId, cart.Status, 0, 0, paymentMethod);
@@ -42,6 +48,9 @@ namespace order_service.OrderService.Infastructure.ServicesImplements
                     newOrderAggregate.AddOrderItem(OrderItemsEntity.CreateOrderItems(newOrderAggregate.IdOrder, item.ProductId, item.ProductName, item.VariantId, item.VariantName, (decimal)item.UnitPrice, item.Quantity, (decimal)item.TotalPrice));
                 }
             }
+
+            // địa chỉ giao hàng 
+            newOrderAggregate.AddDelivery(OrderDeliveryEntity.CreateNewOrderDelivery(newOrderAggregate.IdOrder, AddressUser.NameUser, AddressUser.Phone, AddressUser.Address, AddressUser.Note, DateTime.UtcNow.AddHours(1)));
 
             // discount 
             decimal DiscountAmount = 0;

@@ -5,6 +5,6 @@ namespace order_service.OrderService.Appilcation.Services
 {
     public interface ICreateNewOrder
     {
-        Task<string> Excute(Guid IdCart,PaymentMethod paymentMethod);
+        Task<string> Excute(Guid IdCart,PaymentMethod paymentMethod , Guid IdAddress);
     }
 }

@@ -31,6 +31,7 @@ namespace order_service.OrderService.Domain.Aggregate
         public IReadOnlyList<OrderPaymentsEntity> OrderPaymentsEntities => orderPaymentsEntities.AsReadOnly();
 
 
+        public OrderDeliveryEntity? Delivery { get; private set; }
 
 
         public static OrdersAggregate CreateNewOrder(Guid IdCart, Guid IdCustomer, OrderStatus statusOrder, decimal ShippingFee, decimal Discount, PaymentMethod paymentMethod)
@@ -123,5 +124,12 @@ namespace order_service.OrderService.Domain.Aggregate
         }
 
         #endregion
+
+        public void AddDelivery(OrderDeliveryEntity delivery)
+        {
+            if (Status == OrderStatus.CANCELLED) throw new InvalidOperationException("Order đã bị hủy, không thể thêm thông tin giao hàng");
+            Delivery = delivery;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 }

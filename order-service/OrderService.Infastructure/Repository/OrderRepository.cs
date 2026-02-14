@@ -22,12 +22,9 @@ namespace order_service.OrderService.Infastructure.Repository
         public async Task<ResponseCreateNewOrder> CreateNewOrder(OrdersAggregate NewOrderAggregate)
         {
             var Transaction = await _db.Database.BeginTransactionAsync();
-
             try
             {
                 _logger.LogInformation("Start Create New Order");
-
-
                 var OrderBase = new Order
                 {
                     Id = NewOrderAggregate.IdOrder,
@@ -68,9 +65,21 @@ namespace order_service.OrderService.Infastructure.Repository
                         CreatedAt = p.CreatedAt,
                         PaidAt = p.PaidAt,
 
-                    }).ToList()
+                    }).ToList(),
+
+                    OrderDelivery = new OrderDelivery
+                    {
+                        OrderId = NewOrderAggregate.IdOrder,
+                        Address = NewOrderAggregate.Delivery.Address.Value,
+                        Note = NewOrderAggregate.Delivery?.Note,
+                        Phone = NewOrderAggregate.Delivery?.PhoneNumer.Value ?? "Not identity",
+                        ReceiverName = NewOrderAggregate.Delivery?.ReciverName ?? "User not identity"
+                    }
 
                 };
+
+
+
 
                 await _db.Orders.AddAsync(OrderBase);
 
